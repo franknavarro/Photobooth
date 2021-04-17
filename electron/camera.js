@@ -59,7 +59,6 @@ ipcMain.handle('take-photo', async () => {
       camera.takePicture(
         { targetPath: '/tmp/image.XXXXXX' },
         (camErr, tmpname) => {
-          console.log('PICTURE TAKEN', tmpname);
           if (tmpname) return result(tmpname);
           else return reject('ERROR:' + camErr);
         },

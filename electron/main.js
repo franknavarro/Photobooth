@@ -31,9 +31,9 @@ app.whenReady().then(() => {
   const protocolName = 'image';
   protocol.registerFileProtocol('image', (request, callback) => {
     const url = request.url.substr(8);
-    callback({
-      path: url[0] === '/' ? url : path.normalize(`${__dirname}/${url}`),
-    });
+    const filePath =
+      url[0] === '/' ? url : path.normalize(`${__dirname}/${url}`);
+    callback({ path: filePath });
   });
 
   app.on('activate', () => {

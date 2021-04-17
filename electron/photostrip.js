@@ -13,7 +13,7 @@ const extractSize = ({ width, height }) => ({ width, height });
 
 ipcMain.handle('initialize-strip', async (_, testImg) => {
   try {
-    photostrip = await sharp('/home/pi/Desktop/photostrip.jpg')
+    photostrip = await sharp('/home/pi/Desktop/BrunchPS-01.jpg')
       .jpeg()
       .resize({ ...photostripSize })
       .toBuffer();
@@ -68,29 +68,20 @@ ipcMain.handle('create-strips', async () => {
         background: { r: 0, g: 0, b: 0 },
       },
     });
-    const color = await Promise.all([
-      baseImg
+    const stripsPromise = [
+      { left: photostrip, right: photostrip, path: '/tmp/color.jpg' },
+      { left: photostrip, right: greyscale, path: '/tmp/both.jpg' },
+      { left: greyscale, right: greyscale, path: '/tmp/greyscale.jpg' },
+    ].map(async ({ left, right, path }) => {
+      return await baseImg
         .composite([
-          { input: photostrip, top: 0, left: 0 },
-          { input: photostrip, top: 0, left: photostripSize.width },
+          { input: left, top: 0, left: 0 },
+          { input: right, top: 0, left: photostripSize.width },
         ])
         .withMetadata()
-        .toFile('/tmp/color.jpg'),
-      baseImg
-        .composite([
-          { input: photostrip, top: 0, left: 0 },
-          { input: greyscale, top: 0, left: photostripSize.width },
-        ])
-        .withMetadata()
-        .toFile('/tmp/both.jpg'),
-      baseImg
-        .composite([
-          { input: greyscale, top: 0, left: 0 },
-          { input: greyscale, top: 0, left: photostripSize.width },
-        ])
-        .withMetadata()
-        .toFile('/tmp/greyscale.jpg'),
-    ]);
+        .toFile(path);
+    });
+    await Promise.all(stripsPromise);
     return true;
   } catch (error) {
     console.log(error);

@@ -77,7 +77,7 @@ const TakePictures = () => {
       else if (photostripsMade) history.push('/selection');
     }
     return () => clearTimeout(timeout);
-  });
+  }, [photos, history, photostripsMade]);
 
   return (
     <FullScreen>
