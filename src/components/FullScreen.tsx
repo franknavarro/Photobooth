@@ -1,3 +1,4 @@
+import React, { FC, HTMLAttributes } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -12,10 +13,14 @@ const useStyles = makeStyles({
   },
 });
 
-const FullScreen = ({ children, className, ...props }) => {
+const FullScreen: FC<HTMLAttributes<HTMLDivElement>> = ({
+  children,
+  className,
+  ...props
+}) => {
   const classes = useStyles();
   return (
-    <div className={`${classes.root} ${className}`} {...props}>
+    <div className={`${classes.root} ${className || ''}`} {...props}>
       {children}
     </div>
   );

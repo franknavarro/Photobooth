@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,7 +10,7 @@ import TakePictures from './pages/TakePictures';
 import theme from './theme';
 
 const App = () => {
-  const [ready, setReady] = useState(null);
+  const [ready, setReady] = useState<null | boolean>(null);
 
   useEffect(() => {
     if (ready === null) {
