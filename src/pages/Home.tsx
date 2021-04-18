@@ -1,5 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
+import { FC } from 'react';
 import { useHistory } from 'react-router-dom';
+import { ReadyState } from '../App';
 import Button from '@material-ui/core/Button';
 import CameraAltRoundedIcon from '@material-ui/icons/CameraAltRounded';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -18,7 +20,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = ({ ready, retry }) => {
+interface HomeProps {
+  ready: ReadyState;
+  retry: () => void;
+}
+
+const Home: FC<HomeProps> = ({ ready, retry }) => {
   const classes = useStyles();
   const history = useHistory();
   if (ready) {

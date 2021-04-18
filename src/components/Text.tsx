@@ -1,5 +1,6 @@
+import { FC } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import Typography, { TypographyProps } from '@material-ui/core/Typography';
 
 const useStyles = makeStyles({
   text: {
@@ -10,11 +11,12 @@ const useStyles = makeStyles({
 
 const DEFAULT_TEXT = 'h2';
 
-const Text = ({ children, className, ...props }) => {
+export type TextProps = TypographyProps;
+
+const Text: FC<TextProps> = ({ children, className, ...props }) => {
   const classes = useStyles();
-  const textProps = {
+  const textProps: TextProps = {
     variant: DEFAULT_TEXT,
-    component: DEFAULT_TEXT,
     className: `${classes.text} ${className || ''}`,
     ...props,
   };

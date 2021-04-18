@@ -9,8 +9,10 @@ import SelectStrip from './pages/SelectStrip';
 import TakePictures from './pages/TakePictures';
 import theme from './theme';
 
+export type ReadyState = boolean | null;
+
 const App = () => {
-  const [ready, setReady] = useState<null | boolean>(null);
+  const [ready, setReady] = useState<ReadyState>(null);
 
   useEffect(() => {
     if (ready === null) {

@@ -1,3 +1,4 @@
+import { FC, HTMLAttributes } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -9,7 +10,9 @@ const useStyles = makeStyles({
   },
 });
 
-const FlexBox = ({ children, className, ...props }) => {
+export type FlexBoxProps = HTMLAttributes<HTMLDivElement>;
+
+const FlexBox: FC<FlexBoxProps> = ({ children, className, ...props }) => {
   const classes = useStyles();
   return (
     <div className={`${classes.flexBox} ${className || ''}`} {...props}>
