@@ -23,14 +23,19 @@ const Print = () => {
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    window.printer.start(file).then(() => {
-      setPrinting(true);
-      setStarted(1);
-    });
+    if (file) {
+      window.printer.start(file).then(() => {
+        setPrinting(1);
+        setStarted(true);
+      });
+    } else {
+      setPrinting(0);
+      setStarted(true);
+    }
   }, [file]);
 
   useEffect(() => {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     if (printing && started) {
       timeout = setTimeout(() => {
         window.printer.status().then((status) => {
@@ -47,7 +52,7 @@ const Print = () => {
   return (
     <FullScreen>
       <CircularProgress color="primary" size={iconSize} />
-      <Text className={classes.text}>Printing... {file}</Text>
+      <Text className={classes.text}>Printing...</Text>
     </FullScreen>
   );
 };
