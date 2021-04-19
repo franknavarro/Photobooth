@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import FlexBox from '../components/FlexBox';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
-import Grid from '@material-ui/core/Grid';
+import Grid, { GridSize } from '@material-ui/core/Grid';
 import Text from '../components/Text';
 
 const useStyles = makeStyles((theme) => ({
@@ -42,10 +42,10 @@ const SelectStrip = () => {
   const classes = useStyles();
   const history = useHistory();
   const [count] = useCountDown(10);
+  const gridSize = Math.round(12 / STRIPS.length) as GridSize;
 
   const select = useCallback(
-    (option) => {
-      console.log(option);
+    (option: number) => {
       history.push(
         `/print?file=${encodeURIComponent(STRIPS[option].location)}`,
       );
@@ -63,12 +63,7 @@ const SelectStrip = () => {
       <FlexBox>
         <Grid container spacing={3} className={classes.buttonBox}>
           {STRIPS.map(({ name, location }, index) => (
-            <Grid
-              item
-              xs={12 / STRIPS.length}
-              key={name}
-              className={classes.gridBox}
-            >
+            <Grid item xs={gridSize} key={name} className={classes.gridBox}>
               <Button
                 variant="contained"
                 color="primary"
