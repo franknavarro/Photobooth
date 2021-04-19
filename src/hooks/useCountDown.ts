@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const useCountDown = (start = 6) => {
-  const [count, setCount] = useState(start);
+type ResetCount = (start: number) => void;
 
-  const resetCount = useCallback((newStart) => {
+const useCountDown = (start = 6): [number, ResetCount] => {
+  const [count, setCount] = useState<number>(start);
+
+  const resetCount = useCallback<ResetCount>((newStart) => {
     setCount(newStart);
   }, []);
 
   useEffect(() => {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     if (count > 0) {
       timeout = setTimeout(() => setCount(count - 1), 1000);
     }

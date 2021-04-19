@@ -6,7 +6,7 @@ import useLivePreview from '../hooks/useLivePreview';
 import FlexBox from '../components/FlexBox';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
-import Grid from '@material-ui/core/Grid';
+import Grid, { GridSize } from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
   view: {
@@ -35,16 +35,19 @@ const TakePictures = () => {
   const history = useHistory();
   const [preview, run, setRun] = useLivePreview();
   const [count, resetCount] = useCountDown(COUNT_DOWN);
-  const [photos, setPhotos] = useState([]);
-  const [takingPhoto, setTakingPhoto] = useState(false);
-  const [photostripsMade, setPhotostripMade] = useState(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
+  const [photostripsMade, setPhotostripMade] = useState<null | boolean>(null);
+  const gridSize = Math.round(12 / MAX_PHOTOS) as GridSize;
 
-  const reset = useCallback(() => {
+  const reset = useCallback((): void => {
     resetCount(COUNT_DOWN);
     setRun(true);
   }, [resetCount, setRun]);
 
-  const takePhoto = useCallback(async () => {
+  const takePhoto = useCallback(async (): Promise<ReturnType<
+    typeof setTimeout
+  > | void> => {
     setRun(false);
     setTakingPhoto(true);
     const image = await window.camera.takePhoto(photos.length);
@@ -61,13 +64,17 @@ const TakePictures = () => {
   }, [setRun]);
 
   useEffect(() => {
-    let timeout;
-    if (!count && run) timeout = takePhoto();
+    let timeout: ReturnType<typeof setTimeout>;
+    if (!count && run) {
+      takePhoto().then((t) => {
+        if (t) timeout = t;
+      });
+    }
     return () => clearTimeout(timeout);
   }, [count, run, takePhoto]);
 
   useEffect(() => {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     const createStrips = async () => {
       const made = await window.photostrip.createStrips();
       setPhotostripMade(made);
@@ -103,7 +110,7 @@ const TakePictures = () => {
       <Grid container spacing={3} className={classes.photoPreview}>
         {photos.map((photo, index) => {
           return (
-            <Grid item xs={Math.floor(12 / MAX_PHOTOS)} key={index}>
+            <Grid item xs={gridSize} key={index}>
               <img
                 src={`image://${photo}`}
                 alt={`${index + 1}`}

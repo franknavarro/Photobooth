@@ -5,9 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('camera', {
   getPreview: () => ipcRenderer.invoke('get-preview'),
   takePhoto: async (position) => {
-    let start = process.hrtime();
     const image = await ipcRenderer.invoke('take-photo');
-    start = process.hrtime();
     const smallImg = await ipcRenderer.invoke('add-image', image, position);
     return smallImg;
   },

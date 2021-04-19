@@ -1,14 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 
-const useLivePreview = (framerate = 20) => {
-  const [run, setRun] = useState(false);
-  const [previewImg, setPreviewImg] = useState('');
+type ResetImage = (file: string) => void;
+type SetRun = Dispatch<SetStateAction<boolean>>;
+
+const useLivePreview = (): [string, boolean, SetRun] => {
+  const [run, setRun] = useState<boolean>(false);
+  const [previewImg, setPreviewImg] = useState<string>('');
 
   const removeImage = useCallback((img) => {
     if (img) window.camera.deleteImg(img);
   }, []);
 
-  const resetImage = useCallback(
+  const resetImage = useCallback<ResetImage>(
     (currentImage) => {
       setPreviewImg((oldImage) => {
         removeImage(oldImage);
@@ -19,7 +28,7 @@ const useLivePreview = (framerate = 20) => {
   );
 
   useEffect(() => {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     const updatePreview = async () => {
       if (run) {
         const timePrev = window.standard.hrtime();
