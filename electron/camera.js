@@ -2,70 +2,77 @@ const { ipcMain } = require('electron');
 const child_process = require('child_process');
 const fs = require('fs');
 const gphoto2 = require('gphoto2');
-const sharp = require('sharp');
+const util = require('util');
 
+const exec = util.promisify(child_process.exec);
 const GPhoto = new gphoto2.GPhoto2();
 let camera;
 
-ipcMain.handle('initialize-camera', async () => {
-  if (camera) {
-    return await new Promise((res) => res(true));
-  }
-  return await new Promise((result) => {
-    // kill any running gphoto2 instances before retrieving camera
-    child_process.exec(
-      "kill $(ps aux | grep gphoto | grep -v grep | awk '{print $2}')",
-      () => {
-        GPhoto.list((list) => {
-          if (list.length === 0) return result(false);
-          camera = list[0];
-          camera.setConfigValue('capturetarget', 1, (er) => {
-            if (er) return result(false);
-            camera.setConfigValue('autofocus', 1, (er) => {
-              if (er) return result(false);
-              result(true);
-            });
-          });
-        });
-      },
-    );
+const listCameras = () => {
+  return new Promise((result, reject) => {
+    GPhoto.list((list) => {
+      if (list.length === 0) return reject('No cameras found');
+      result(list);
+    });
   });
+};
+
+const setCameraConfig = (key, value) => {
+  return new Promise((result, reject) => {
+    if (!camera) reject('No camera available to set config');
+    camera.setConfigValue(key, value, (error) => {
+      if (error) {
+        return reject(
+          `Error setting config ${key} to ${value} for ${camera.model}`,
+        );
+      }
+      result();
+    });
+  });
+};
+
+const takePicture = (options) => {
+  return new Promise((result, reject) => {
+    if (!camera) reject('No camera available to take pitcure');
+    camera.takePicture(options, (error, file) => {
+      if (file) return result(file);
+      reject(error);
+    });
+  });
+};
+
+ipcMain.handle('initialize-camera', async () => {
+  if (camera) return true;
+
+  // kill any running gphoto2 instances before retrieving camera
+  try {
+    await exec(
+      "kill $(ps aux | grep gphoto | grep -v grep | awk '{print $2}')",
+    );
+  } catch {}
+
+  try {
+    const cameras = await listCameras();
+    camera = cameras[0];
+    await setCameraConfig('capturetarget', 1);
+    await setCameraConfig('autofocus', 1);
+    await setCameraConfig('flashmode', 0);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 });
 
 ipcMain.handle('get-preview', async () => {
-  if (!camera) {
-    return await new Promise((_, reject) => reject('No camera connected.'));
-  }
-  return await new Promise((result, reject) => {
-    camera.takePicture(
-      {
-        preview: true,
-        targetPath: '/tmp/preview.XXXXXX',
-      },
-      (error, tmpname) => {
-        if (tmpname) result(tmpname);
-        else reject('ERROR:' + error);
-      },
-    );
+  return await takePicture({
+    preview: true,
+    targetPath: '/tmp/preview.XXXXXX',
   });
 });
 
 ipcMain.handle('take-photo', async () => {
-  let result;
-  if (!camera) {
-    result = await new Promise((_, reject) => reject('No camera connected.'));
-  } else {
-    result = await new Promise((result) => {
-      camera.takePicture(
-        { targetPath: '/tmp/image.XXXXXX' },
-        (camErr, tmpname) => {
-          if (tmpname) return result(tmpname);
-          else return reject('ERROR:' + camErr);
-        },
-      );
-    });
-  }
-  return result;
+  return await takePicture({ targetPath: '/tmp/image.XXXXXX' });
 });
 
 ipcMain.on('delete-img', (_, path) => {
