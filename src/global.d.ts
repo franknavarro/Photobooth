@@ -1,11 +1,12 @@
 interface Window {
   camera: {
+    initialize: () => Promise<void>;
     deleteImg: (file: string) => Promise<void>;
     getPreview: () => Promise<string>;
     takePhoto: (index: number) => Promise<string>;
   };
   photostrip: {
-    initialize: () => Promise<boolean>;
+    initialize: () => Promise<void>;
     createStrips: () => Promise<boolean>;
   };
   printer: {

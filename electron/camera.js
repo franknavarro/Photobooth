@@ -2,11 +2,16 @@ const { ipcMain } = require('electron');
 const child_process = require('child_process');
 const fs = require('fs');
 const gphoto2 = require('gphoto2');
+const os = require('os');
+const path = require('path');
 const util = require('util');
 
 const exec = util.promisify(child_process.exec);
+const makeTemp = util.promisify(fs.mkdtemp);
+
 const GPhoto = new gphoto2.GPhoto2();
 let camera;
+let tmpdir;
 
 const listCameras = () => {
   return new Promise((result, reject) => {
@@ -42,7 +47,7 @@ const takePicture = (options) => {
 };
 
 ipcMain.handle('initialize-camera', async () => {
-  if (camera) return true;
+  if (camera) return;
 
   // kill any running gphoto2 instances before retrieving camera
   try {
@@ -51,30 +56,25 @@ ipcMain.handle('initialize-camera', async () => {
     );
   } catch {}
 
-  try {
-    const cameras = await listCameras();
-    camera = cameras[0];
-    await setCameraConfig('capturetarget', 1);
-    await setCameraConfig('autofocus', 1);
-    await setCameraConfig('flashmode', 0);
-    return true;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
+  tmpdir = await makeTemp(path.join(os.tmpdir(), 'photobooth-camera-'));
+  const cameras = await listCameras();
+  camera = cameras[0];
+  await setCameraConfig('capturetarget', 1);
+  await setCameraConfig('autofocus', 1);
+  await setCameraConfig('flashmode', 0);
 });
 
 ipcMain.handle('get-preview', async () => {
   return await takePicture({
     preview: true,
-    targetPath: '/tmp/preview.XXXXXX',
+    targetPath: path.join(tmpdir, 'preview.XXXXXX'),
   });
 });
 
 ipcMain.handle('take-photo', async () => {
-  return await takePicture({ targetPath: '/tmp/image.XXXXXX' });
+  return await takePicture({ targetPath: path.join(tmpdir, 'image.XXXXXX') });
 });
 
-ipcMain.on('delete-img', (_, path) => {
-  fs.unlink(path, () => null);
+ipcMain.on('delete-img', (_, file) => {
+  fs.unlink(file, () => null);
 });

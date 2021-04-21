@@ -3,6 +3,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('camera', {
+  initialize: () => ipcRenderer.invoke('initialize-camera'),
   getPreview: () => ipcRenderer.invoke('get-preview'),
   takePhoto: async (position) => {
     const image = await ipcRenderer.invoke('take-photo');
@@ -18,13 +19,9 @@ contextBridge.exposeInMainWorld('standard', {
 
 contextBridge.exposeInMainWorld('photostrip', {
   initialize: async () => {
-    const cameraInit = await ipcRenderer.invoke('initialize-camera');
-    if (cameraInit) {
-      const testImg = await ipcRenderer.invoke('take-photo');
-      return ipcRenderer.invoke('initialize-strip', testImg);
-    } else {
-      return false;
-    }
+    const testImg = await ipcRenderer.invoke('take-photo');
+    await ipcRenderer.invoke('initialize-strip', testImg);
+    ipcRenderer.send('delete-img', testImg);
   },
   createStrips: () => ipcRenderer.invoke('create-strips'),
 });

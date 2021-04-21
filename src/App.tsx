@@ -1,47 +1,48 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import ErrorMessage from './pages/ErrorMessage';
 import FullScreen from './components/FullScreen';
-import Home from './pages/Home';
-import Print from './pages/Print';
-import SelectStrip from './pages/SelectStrip';
-import TakePictures from './pages/TakePictures';
+import Loading from './pages/Loading';
+import Router from './Router';
 import theme from './theme';
 
-export type ReadyState = boolean | null;
-
 const App = () => {
-  const [ready, setReady] = useState<ReadyState>(null);
+  const [ready, setReady] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  const initializeApp = useCallback(async () => {
+    try {
+      await window.camera.initialize();
+      await window.photostrip.initialize();
+      setReady(true);
+    } catch (err) {
+      const messages = err.toString().split(':');
+      messages.splice(1, 1);
+      setError(messages.join(':'));
+    }
+  }, []);
+
+  const reInitialize = () => {
+    setReady(false);
+    setError('');
+  };
 
   useEffect(() => {
-    if (ready === null) {
-      window.photostrip.initialize().then((initialized) => {
-        setReady(initialized);
-      });
-    }
-  }, [ready]);
+    if (!ready && !error) initializeApp();
+  }, [ready, error, initializeApp]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <FullScreen>
-        <Router>
-          <Switch>
-            <Route path="/print">
-              <Print />
-            </Route>
-            <Route path="/selection">
-              <SelectStrip />
-            </Route>
-            <Route path="/takePictures">
-              <TakePictures />
-            </Route>
-            <Route path="/">
-              <Home ready={ready} retry={() => setReady(null)} />
-            </Route>
-          </Switch>
-        </Router>
+        {error ? (
+          <ErrorMessage retry={reInitialize} message={error} />
+        ) : ready ? (
+          <Router />
+        ) : (
+          <Loading text="Getting photobooth ready..." />
+        )}
       </FullScreen>
     </ThemeProvider>
   );
