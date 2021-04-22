@@ -1,0 +1,14 @@
+[Unit]
+Description=Rotate Touch Screen Display
+
+[Service]
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStart=/home/pi/.touchscreen-rotation.sh
+Restart=on-failure
+RestartSec=1s
+KillMode=process
+TimeoutSec=infinity
+
+[Install]
+WantedBy=graphical.target
