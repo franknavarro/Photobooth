@@ -1,11 +1,19 @@
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Home from './pages/Home';
 import Print from './pages/Print';
 import SelectStrip from './pages/SelectStrip';
 import TakePictures from './pages/TakePictures';
 
+interface PhotostripData {
+  path: string;
+  description: string;
+}
+export type PhotostripList = PhotostripData[];
+
 const Router: FC = () => {
+  const [photostrips, setPhotostrips] = useState<PhotostripList>([]);
+
   return (
     <BrowserRouter>
       <Switch>
@@ -13,10 +21,13 @@ const Router: FC = () => {
           <Print />
         </Route>
         <Route path="/selection">
-          <SelectStrip />
+          <SelectStrip photostrips={photostrips} />
         </Route>
         <Route path="/takePictures">
-          <TakePictures />
+          <TakePictures
+            photostrips={photostrips}
+            setPhotostrips={setPhotostrips}
+          />
         </Route>
         <Route path="/">
           <Home />

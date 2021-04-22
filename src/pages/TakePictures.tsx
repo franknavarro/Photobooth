@@ -1,6 +1,14 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { useEffect, useState, useCallback } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  FC,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { useHistory } from 'react-router-dom';
+import { PhotostripList } from '../Router';
 import useCountDown from '../hooks/useCountDown';
 import useLivePreview from '../hooks/useLivePreview';
 import FlexBox from '../components/FlexBox';
@@ -30,14 +38,21 @@ const COUNT_DOWN = 6;
 const MAX_PHOTOS = 3;
 const WAIT_SECONDS = 4;
 
-const TakePictures = () => {
+interface TakePicturesProps {
+  photostrips: PhotostripList;
+  setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
+}
+
+const TakePictures: FC<TakePicturesProps> = ({
+  photostrips,
+  setPhotostrips,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   const [preview, run, setRun] = useLivePreview();
   const [count, resetCount] = useCountDown(COUNT_DOWN);
   const [photos, setPhotos] = useState<string[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
-  const [photostripsMade, setPhotostripMade] = useState<null | boolean>(null);
   const gridSize = Math.round(12 / MAX_PHOTOS) as GridSize;
 
   const reset = useCallback((): void => {
@@ -73,18 +88,19 @@ const TakePictures = () => {
     return () => clearTimeout(timeout);
   }, [count, run, takePhoto]);
 
+  // Generate Photostrips
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
     const createStrips = async () => {
-      const made = await window.photostrip.createStrips();
-      setPhotostripMade(made);
+      const stripData = await window.photostrip.createStrips();
+      setPhotostrips([...stripData]);
+      history.push('/selection');
     };
-    if (photos.length === MAX_PHOTOS) {
-      if (photostripsMade === null) createStrips();
-      else if (photostripsMade) history.push('/selection');
+    if (photos.length === MAX_PHOTOS && photostrips.length === 0) {
+      createStrips();
+    } else if (photos.length === 0 && photostrips.length !== 0) {
+      setPhotostrips([]);
     }
-    return () => clearTimeout(timeout);
-  }, [photos, history, photostripsMade]);
+  }, [photos, history, photostrips, setPhotostrips]);
 
   return (
     <FullScreen>

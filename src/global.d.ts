@@ -1,3 +1,5 @@
+type PhotostripList = import('./Router').PhotostripList;
+
 interface Window {
   camera: {
     initialize: () => Promise<void>;
@@ -7,7 +9,7 @@ interface Window {
   };
   photostrip: {
     initialize: () => Promise<void>;
-    createStrips: () => Promise<boolean>;
+    createStrips: () => Promise<PhotostripList>;
   };
   printer: {
     start: (file: string) => Promise<void>;

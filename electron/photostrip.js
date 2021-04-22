@@ -1,4 +1,6 @@
-const { ipcMain, ipcRenderer } = require('electron');
+const { ipcMain } = require('electron');
+const { appendTmp } = require('./tempDirectory');
+const path = require('path');
 const sharp = require('sharp');
 
 let imageResize;
@@ -68,11 +70,27 @@ ipcMain.handle('create-strips', async () => {
         background: { r: 0, g: 0, b: 0 },
       },
     });
-    const stripsPromise = [
-      { left: photostrip, right: photostrip, path: '/tmp/color.jpg' },
-      { left: photostrip, right: greyscale, path: '/tmp/both.jpg' },
-      { left: greyscale, right: greyscale, path: '/tmp/greyscale.jpg' },
-    ].map(async ({ left, right, path }) => {
+    const stripsList = [
+      {
+        left: photostrip,
+        right: photostrip,
+        path: appendTmp('color.jpg'),
+        description: 'Color',
+      },
+      {
+        left: photostrip,
+        right: greyscale,
+        path: appendTmp('both.jpg'),
+        description: 'Both',
+      },
+      {
+        left: greyscale,
+        right: greyscale,
+        path: appendTmp('greyscale.jpg'),
+        description: 'Black & White',
+      },
+    ];
+    const stripsPromise = stripsList.map(async ({ left, right, path }) => {
       return await baseImg
         .composite([
           { input: left, top: 0, left: 0 },
@@ -82,9 +100,9 @@ ipcMain.handle('create-strips', async () => {
         .toFile(path);
     });
     await Promise.all(stripsPromise);
-    return true;
+    return stripsList.map(({ path, description }) => ({ path, description }));
   } catch (error) {
     console.log(error);
-    return false;
+    throw new Error('Strips failed to generate...');
   }
 });

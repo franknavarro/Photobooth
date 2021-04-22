@@ -1,6 +1,7 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, FC } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import { PhotostripList } from '../Router';
 import useCountDown from '../hooks/useCountDown';
 import Button from '@material-ui/core/Button';
 import FlexBox from '../components/FlexBox';
@@ -32,25 +33,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const STRIPS = [
-  { name: 'Color', location: '/tmp/color.jpg' },
-  { name: 'Black & White', location: '/tmp/greyscale.jpg' },
-  { name: 'Both', location: '/tmp/both.jpg' },
-];
+interface SelectStripProps {
+  photostrips: PhotostripList;
+}
 
-const SelectStrip = () => {
+const SelectStrip: FC<SelectStripProps> = ({ photostrips }) => {
   const classes = useStyles();
   const history = useHistory();
   const [count] = useCountDown(10);
-  const gridSize = Math.round(12 / STRIPS.length) as GridSize;
+  const gridSize = Math.round(12 / photostrips.length) as GridSize;
 
   const select = useCallback(
     (option: number) => {
       history.push(
-        `/print?file=${encodeURIComponent(STRIPS[option].location)}`,
+        `/print?file=${encodeURIComponent(photostrips[option].path)}`,
       );
     },
-    [history],
+    [history, photostrips],
   );
 
   useEffect(() => {
@@ -62,8 +61,13 @@ const SelectStrip = () => {
       <FlexText>Select a print...</FlexText>
       <FlexBox>
         <Grid container spacing={3} className={classes.buttonBox}>
-          {STRIPS.map(({ name, location }, index) => (
-            <Grid item xs={gridSize} key={name} className={classes.gridBox}>
+          {photostrips.map(({ description, path }, index) => (
+            <Grid
+              item
+              xs={gridSize}
+              key={description}
+              className={classes.gridBox}
+            >
               <Button
                 variant="contained"
                 color="primary"
@@ -71,12 +75,12 @@ const SelectStrip = () => {
               >
                 <div className={classes.imgBox}>
                   <img
-                    src={`image://${location}`}
-                    alt={name}
+                    src={`image://${path}`}
+                    alt={description}
                     className={classes.img}
                   />
                   <Text variant="h5" className={classes.buttonText}>
-                    {name}
+                    {description}
                   </Text>
                 </div>
               </Button>
