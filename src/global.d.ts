@@ -1,5 +1,18 @@
 type PhotostripList = import('./Router').PhotostripList;
 
+interface MyStore {
+  photostrip: {
+    maxPhotos: number;
+  };
+  interface: {
+    initialCount: number;
+    countTime: number;
+    waitTime: number;
+  };
+}
+
+type Store = import('electron-store')<MyStore>;
+
 interface Window {
   camera: {
     initialize: () => Promise<void>;
@@ -18,4 +31,5 @@ interface Window {
   standard: {
     hrtime: NodeJS.HRTime;
   };
+  store: Pick<Store, 'store'>;
 }

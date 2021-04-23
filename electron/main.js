@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
 const { app, protocol, BrowserWindow } = require('electron');
 const path = require('path');
+const Store = require('electron-store');
 
 const isDev = !app.isPackaged;
 
@@ -52,6 +53,7 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+Store.initRenderer();
 require('./camera');
 require('./photostrip');
 require('./print');

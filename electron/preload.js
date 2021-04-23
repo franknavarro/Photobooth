@@ -1,6 +1,7 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 const { contextBridge, ipcRenderer } = require('electron');
+const { store } = require('./store');
 
 contextBridge.exposeInMainWorld('camera', {
   initialize: () => ipcRenderer.invoke('initialize-camera'),
@@ -29,4 +30,8 @@ contextBridge.exposeInMainWorld('photostrip', {
 contextBridge.exposeInMainWorld('printer', {
   start: (photo) => ipcRenderer.invoke('start-print', photo),
   status: () => ipcRenderer.invoke('print-status'),
+});
+
+contextBridge.exposeInMainWorld('store', {
+  store: store.store,
 });

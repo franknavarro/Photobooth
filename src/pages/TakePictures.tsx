@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom';
 import { PhotostripList } from '../Router';
 import useCountDown from '../hooks/useCountDown';
 import useLivePreview from '../hooks/useLivePreview';
+import useStore from '../hooks/useStore';
 import FlexBox from '../components/FlexBox';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
@@ -34,10 +35,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const COUNT_DOWN = 6;
-const MAX_PHOTOS = 3;
-const WAIT_SECONDS = 4;
-
 interface TakePicturesProps {
   photostrips: PhotostripList;
   setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
@@ -49,16 +46,17 @@ const TakePictures: FC<TakePicturesProps> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
+  const store = useStore();
   const [preview, run, setRun] = useLivePreview();
-  const [count, resetCount] = useCountDown(COUNT_DOWN);
+  const [count, resetCount] = useCountDown(store.interface.initialCount);
   const [photos, setPhotos] = useState<string[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
-  const gridSize = Math.round(12 / MAX_PHOTOS) as GridSize;
+  const gridSize = Math.round(12 / store.photostrip.maxPhotos) as GridSize;
 
   const reset = useCallback((): void => {
-    resetCount(COUNT_DOWN);
+    resetCount(store.interface.countTime);
     setRun(true);
-  }, [resetCount, setRun]);
+  }, [resetCount, setRun, store]);
 
   const takePhoto = useCallback(async (): Promise<ReturnType<
     typeof setTimeout
@@ -69,10 +67,10 @@ const TakePictures: FC<TakePicturesProps> = ({
     setPhotos([...photos, image]);
     setTakingPhoto(false);
 
-    if (photos.length < MAX_PHOTOS - 1) {
-      return setTimeout(reset, WAIT_SECONDS * 1000);
+    if (photos.length < store.photostrip.maxPhotos - 1) {
+      return setTimeout(reset, store.interface.waitTime * 1000);
     }
-  }, [photos, reset, setRun]);
+  }, [photos, reset, setRun, store]);
 
   useEffect(() => {
     setRun(true);
@@ -95,12 +93,15 @@ const TakePictures: FC<TakePicturesProps> = ({
       setPhotostrips([...stripData]);
       history.push('/selection');
     };
-    if (photos.length === MAX_PHOTOS && photostrips.length === 0) {
+    if (
+      photos.length === store.photostrip.maxPhotos &&
+      photostrips.length === 0
+    ) {
       createStrips();
     } else if (photos.length === 0 && photostrips.length !== 0) {
       setPhotostrips([]);
     }
-  }, [photos, history, photostrips, setPhotostrips]);
+  }, [photos, history, photostrips, setPhotostrips, store]);
 
   return (
     <FullScreen>
@@ -115,7 +116,7 @@ const TakePictures: FC<TakePicturesProps> = ({
         <div className={classes.view} />
       )}
       <FlexText>
-        {count === COUNT_DOWN
+        {count === store.interface.countTime
           ? 'Get Ready...'
           : count
           ? count
