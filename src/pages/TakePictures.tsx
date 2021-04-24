@@ -52,6 +52,9 @@ const TakePictures: FC<TakePicturesProps> = ({
   const [photos, setPhotos] = useState<string[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const gridSize = Math.round(12 / store.photostrip.maxPhotos) as GridSize;
+  const startingCount = photos.length
+    ? store.interface.countTime
+    : store.interface.initialCount;
 
   const reset = useCallback((): void => {
     resetCount(store.interface.countTime);
@@ -116,7 +119,7 @@ const TakePictures: FC<TakePicturesProps> = ({
         <div className={classes.view} />
       )}
       <FlexText>
-        {count === store.interface.countTime
+        {count === startingCount
           ? 'Get Ready...'
           : count
           ? count
