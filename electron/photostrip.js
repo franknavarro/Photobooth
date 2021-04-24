@@ -1,43 +1,75 @@
 const { ipcMain } = require('electron');
 const { appendTmp } = require('./tempDirectory');
-const path = require('path');
 const sharp = require('sharp');
 
-let imageResize;
-let photostrip;
 const DPI = 300;
-const BORDER = Math.round((1 / 8) * DPI);
-const photostripSize = {
+const WHITE_BOX = {
+  channels: 3,
+  background: { r: 255, g: 255, b: 255 },
+};
+
+let photostrip;
+let imageResize;
+let border = {
+  horizontal: 0,
+  vertical: 0,
+};
+let photostripSize = {
   width: 2 * DPI,
   height: 6 * DPI,
 };
+
 const extractSize = ({ width, height }) => ({ width, height });
 
-ipcMain.handle('initialize-strip', async (_, testImg) => {
-  try {
-    photostrip = await sharp('/home/pi/Desktop/BrunchPS-01.jpg')
-      .jpeg()
-      .resize({ ...photostripSize })
-      .toBuffer();
-    const imgMetadata = await sharp(testImg).metadata();
-    const imageSize = extractSize(imgMetadata);
+ipcMain.handle(
+  'initialize-strip',
+  async (_, stripImage, testImg, borderSize, stripSize) => {
+    try {
+      border = {
+        horizontal: borderSize.horizontal,
+        vertical: borderSize.vertical,
+      };
+      photostripSize = {
+        width: stripSize.width * DPI,
+        height: stripSize.height * DPI,
+      };
 
-    const photoBoxSize = {
-      width: photostripSize.width - BORDER * 2,
-      height: Math.round(photostripSize.height / 4) - BORDER * 2,
-    };
-    imageResize = {
-      width: photoBoxSize.width,
-      height: Math.round(
-        (photoBoxSize.width * imageSize.height) / imageSize.width,
-      ),
-    };
-    return true;
-  } catch (error) {
-    console.log(error);
-    return false;
-  }
-});
+      if (stripImage) {
+        photostrip = await sharp(stripImage)
+          .jpeg()
+          .resize({ ...photostripSize })
+          .toBuffer();
+      } else {
+        console.log({ stripSize, photostripSize, WHITE_BOX });
+        photostrip = await sharp({
+          create: {
+            ...photostripSize,
+            ...WHITE_BOX,
+          },
+        })
+          .jpeg()
+          .toBuffer();
+      }
+      const imgMetadata = await sharp(testImg).metadata();
+      const imageSize = extractSize(imgMetadata);
+
+      const photoBoxSize = {
+        width: photostripSize.width - border.horizontal * 2,
+        height: Math.round(photostripSize.height / 4) - border.vertical * 1.5,
+      };
+      imageResize = {
+        width: photoBoxSize.width,
+        height: Math.round(
+          (photoBoxSize.width * imageSize.height) / imageSize.width,
+        ),
+      };
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  },
+);
 
 ipcMain.handle('add-image', async (_, image, position) => {
   try {
@@ -47,8 +79,9 @@ ipcMain.handle('add-image', async (_, image, position) => {
       .composite([
         {
           input: newName,
-          top: BORDER * (position + 1) + imageResize.height * position,
-          left: BORDER,
+          top:
+            border.horizontal * (position + 1) + imageResize.height * position,
+          left: border.vertical,
         },
       ])
       .toBuffer();

@@ -19,9 +19,15 @@ contextBridge.exposeInMainWorld('standard', {
 });
 
 contextBridge.exposeInMainWorld('photostrip', {
-  initialize: async () => {
+  initialize: async (stripImage, borderSize, stripSize) => {
     const testImg = await ipcRenderer.invoke('take-photo');
-    await ipcRenderer.invoke('initialize-strip', testImg);
+    await ipcRenderer.invoke(
+      'initialize-strip',
+      stripImage,
+      testImg,
+      borderSize,
+      stripSize,
+    );
     ipcRenderer.send('delete-img', testImg);
   },
   createStrips: () => ipcRenderer.invoke('create-strips'),

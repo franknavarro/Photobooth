@@ -16,14 +16,18 @@ const App = () => {
   const initializeApp = useCallback(async () => {
     try {
       await window.camera.initialize();
-      await window.photostrip.initialize();
+      await window.photostrip.initialize(
+        store.photostrip.stripImage,
+        store.photostrip.borders,
+        store.photostrip.stripSize,
+      );
       setReady(true);
     } catch (err) {
       const messages = err.toString().split(':');
       messages.splice(1, 1);
       setError(messages.join(':'));
     }
-  }, []);
+  }, [store]);
 
   const reInitialize = () => {
     setReady(false);

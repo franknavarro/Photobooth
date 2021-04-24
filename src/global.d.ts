@@ -11,7 +11,11 @@ interface Window {
     takePhoto: (index: number) => Promise<string>;
   };
   photostrip: {
-    initialize: () => Promise<void>;
+    initialize: (
+      stripImage: PhotoboothStore['photostrip']['stripImage'],
+      borderSize: PhotoboothStore['photostrip']['borders'],
+      stripSize: PhotoboothStore['photostrip']['stripSize'],
+    ) => Promise<void>;
     createStrips: () => Promise<PhotostripList>;
   };
   printer: {
