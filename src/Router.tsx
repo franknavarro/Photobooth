@@ -11,20 +11,28 @@ interface PhotostripData {
 }
 export type PhotostripList = PhotostripData[];
 
-const Router: FC = () => {
+interface RouterProps {
+  store: PhotoboothStore;
+}
+
+const Router: FC<RouterProps> = ({ store }) => {
   const [photostrips, setPhotostrips] = useState<PhotostripList>([]);
 
   return (
     <BrowserRouter>
       <Switch>
         <Route path="/print">
-          <Print />
+          <Print printerName={store.printer.printerName} />
         </Route>
         <Route path="/selection">
           <SelectStrip photostrips={photostrips} />
         </Route>
         <Route path="/takePictures">
           <TakePictures
+            initialCount={store.interface.initialCount}
+            countTime={store.interface.countTime}
+            waitTime={store.interface.waitTime}
+            maxPhotos={store.photostrip.maxPhotos}
             photostrips={photostrips}
             setPhotostrips={setPhotostrips}
           />

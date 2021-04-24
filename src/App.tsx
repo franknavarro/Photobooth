@@ -6,8 +6,10 @@ import FullScreen from './components/FullScreen';
 import Loading from './pages/Loading';
 import Router from './Router';
 import theme from './theme';
+import useStore from './hooks/useStore';
 
 const App = () => {
+  const [store] = useStore();
   const [ready, setReady] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -39,7 +41,7 @@ const App = () => {
         {error ? (
           <ErrorMessage retry={reInitialize} message={error} />
         ) : ready ? (
-          <Router />
+          <Router store={store} />
         ) : (
           <Loading text="Getting photobooth ready..." />
         )}

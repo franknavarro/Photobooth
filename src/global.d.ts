@@ -1,20 +1,7 @@
 type PhotostripList = import('./Router').PhotostripList;
+type PhotoboothStore = import('./store');
 
-interface MyStore {
-  photostrip: {
-    maxPhotos: number;
-  };
-  interface: {
-    initialCount: number;
-    countTime: number;
-    waitTime: number;
-  };
-  printer: {
-    printerName: string;
-  };
-}
-
-type Store = import('electron-store')<MyStore>;
+type Store = import('electron-store')<PhotoboothStore>;
 
 interface Window {
   camera: {
