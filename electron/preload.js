@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('photostrip', {
 });
 
 contextBridge.exposeInMainWorld('printer', {
-  start: (photo) => ipcRenderer.invoke('start-print', photo),
+  start: (printer, photo) => ipcRenderer.invoke('start-print', printer, photo),
   status: () => ipcRenderer.invoke('print-status'),
 });
 

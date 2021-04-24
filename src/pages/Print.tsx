@@ -27,29 +27,37 @@ const Print: FC<PrintProps> = ({ printerName }) => {
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    if (file && printerName) {
-      window.printer.start(printerName, file).then(() => {
+    const startPrint = async () => {
+      try {
+        if (!printerName) throw new Error('No printer specified.');
+        if (!file) throw new Error('No file found to print.');
+        await window.printer.start(printerName, file);
         setPrinting(1);
         setStarted(true);
-      });
-    } else {
-      setPrinting(0);
-      setStarted(true);
-    }
+      } catch (err) {
+        console.error(err.message);
+        setPrinting(0);
+        setStarted(true);
+      }
+    };
+    startPrint();
   }, [file, printerName]);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
+
+    const getPrinterStatus = async () => {
+      const status = await window.printer.status();
+      if (status) setPrinting(printing + 1);
+      else setPrinting(0);
+    };
+
     if (printing && started) {
-      timeout = setTimeout(() => {
-        window.printer.status().then((status) => {
-          if (status) setPrinting(printing + 1);
-          else setPrinting(0);
-        });
-      }, 500);
+      timeout = setTimeout(getPrinterStatus, 500);
     } else if (!printing && started) {
       history.push('/');
     }
+
     return () => clearTimeout(timeout);
   }, [history, printing, started]);
 
