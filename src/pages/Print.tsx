@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface PrintProps {
-  printerName: string;
+  printerName: PhotoboothStore['printer']['printerName'];
   selectedStrip: string;
 }
 

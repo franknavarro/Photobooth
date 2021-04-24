@@ -6,7 +6,7 @@ ipcMain.handle('start-print', async (_, printer, printFile) => {
     exec(`lp -d ${printer} ${printFile}`, (error, _, stderr) => {
       if (error) return reject(error);
       else if (stderr) return reject(stderr);
-      return result(true);
+      return result();
     });
   });
 });

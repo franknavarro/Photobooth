@@ -19,7 +19,10 @@ interface Window {
     createStrips: () => Promise<PhotostripList>;
   };
   printer: {
-    start: (printer: string, file: string) => Promise<void>;
+    start: (
+      printer: PhotoboothStore['printer']['printerName'],
+      file: string,
+    ) => Promise<void>;
     status: () => Promise<boolean>;
   };
   standard: {

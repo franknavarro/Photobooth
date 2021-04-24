@@ -35,10 +35,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface TakePicturesProps {
-  initialCount: number;
-  countTime: number;
-  waitTime: number;
-  maxPhotos: number;
+  initialCount: PhotoboothStore['interface']['initialCount'];
+  countTime: PhotoboothStore['interface']['countTime'];
+  waitTime: PhotoboothStore['interface']['waitTime'];
+  maxPhotos: PhotoboothStore['photostrip']['maxPhotos'];
   photostrips: PhotostripList;
   setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
 }

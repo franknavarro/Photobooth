@@ -40,7 +40,6 @@ ipcMain.handle(
           .resize({ ...photostripSize })
           .toBuffer();
       } else {
-        console.log({ stripSize, photostripSize, WHITE_BOX });
         photostrip = await sharp({
           create: {
             ...photostripSize,
