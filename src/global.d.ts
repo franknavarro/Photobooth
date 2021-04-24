@@ -9,6 +9,9 @@ interface MyStore {
     countTime: number;
     waitTime: number;
   };
+  printer: {
+    printerName: string;
+  };
 }
 
 type Store = import('electron-store')<MyStore>;
@@ -25,7 +28,7 @@ interface Window {
     createStrips: () => Promise<PhotostripList>;
   };
   printer: {
-    start: (file: string) => Promise<void>;
+    start: (printer: string, file: string) => Promise<void>;
     status: () => Promise<boolean>;
   };
   standard: {

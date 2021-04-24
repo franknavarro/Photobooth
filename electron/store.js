@@ -35,6 +35,16 @@ const store = new Store({
         },
       },
     },
+    printer: {
+      type: 'object',
+      default: {},
+      properties: {
+        printerName: {
+          type: 'string',
+          default: '',
+        },
+      },
+    },
   },
 });
 

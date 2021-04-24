@@ -1,11 +1,9 @@
 const { ipcMain } = require('electron');
 const { exec } = require('child_process');
 
-const PRINTER = 'DNP';
-
-ipcMain.handle('start-print', async (_, printFile) => {
+ipcMain.handle('start-print', async (_, printer, printFile) => {
   return await new Promise((result, reject) => {
-    exec(`lp -d ${PRINTER} ${printFile}`, (error, stdout, stderr) => {
+    exec(`lp -d ${printer} ${printFile}`, (error, _, stderr) => {
       if (error) return reject(error);
       else if (stderr) return reject(stderr);
       return result(true);
