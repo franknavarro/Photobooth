@@ -1,4 +1,4 @@
-import { useEffect, useCallback, FC } from 'react';
+import { useEffect, useCallback, FC, Dispatch, SetStateAction } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { PhotostripList } from '../Router';
@@ -35,9 +35,13 @@ const useStyles = makeStyles((theme) => ({
 
 interface SelectStripProps {
   photostrips: PhotostripList;
+  setSelectedStrip: Dispatch<SetStateAction<string>>;
 }
 
-const SelectStrip: FC<SelectStripProps> = ({ photostrips }) => {
+const SelectStrip: FC<SelectStripProps> = ({
+  photostrips,
+  setSelectedStrip,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   const [count] = useCountDown(10);
@@ -45,11 +49,10 @@ const SelectStrip: FC<SelectStripProps> = ({ photostrips }) => {
 
   const select = useCallback(
     (option: number) => {
-      history.push(
-        `/print?file=${encodeURIComponent(photostrips[option].path)}`,
-      );
+      setSelectedStrip(photostrips[option].path);
+      history.push('/print');
     },
-    [history, photostrips],
+    [history, photostrips, setSelectedStrip],
   );
 
   useEffect(() => {

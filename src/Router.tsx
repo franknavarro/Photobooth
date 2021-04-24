@@ -17,15 +17,22 @@ interface RouterProps {
 
 const Router: FC<RouterProps> = ({ store }) => {
   const [photostrips, setPhotostrips] = useState<PhotostripList>([]);
+  const [selectedStrip, setSelectedStrip] = useState<string>('');
 
   return (
     <BrowserRouter>
       <Switch>
         <Route path="/print">
-          <Print printerName={store.printer.printerName} />
+          <Print
+            printerName={store.printer.printerName}
+            selectedStrip={selectedStrip}
+          />
         </Route>
         <Route path="/selection">
-          <SelectStrip photostrips={photostrips} />
+          <SelectStrip
+            photostrips={photostrips}
+            setSelectedStrip={setSelectedStrip}
+          />
         </Route>
         <Route path="/takePictures">
           <TakePictures

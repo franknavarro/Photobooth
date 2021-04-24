@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import { useEffect, useState, FC } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FullScreen from '../components/FullScreen';
 import Text from '../components/Text';
@@ -17,12 +17,12 @@ const useStyles = makeStyles((theme) => ({
 
 interface PrintProps {
   printerName: string;
+  selectedStrip: string;
 }
 
-const Print: FC<PrintProps> = ({ printerName }) => {
+const Print: FC<PrintProps> = ({ printerName, selectedStrip }) => {
   const classes = useStyles();
   const history = useHistory();
-  const file = new URLSearchParams(useLocation().search).get('file');
   const [printing, setPrinting] = useState(0);
   const [started, setStarted] = useState(false);
 
@@ -30,8 +30,8 @@ const Print: FC<PrintProps> = ({ printerName }) => {
     const startPrint = async () => {
       try {
         if (!printerName) throw new Error('No printer specified.');
-        if (!file) throw new Error('No file found to print.');
-        await window.printer.start(printerName, file);
+        if (!selectedStrip) throw new Error('No file found to print.');
+        await window.printer.start(printerName, selectedStrip);
         setPrinting(1);
         setStarted(true);
       } catch (err) {
@@ -41,7 +41,7 @@ const Print: FC<PrintProps> = ({ printerName }) => {
       }
     };
     startPrint();
-  }, [file, printerName]);
+  }, [selectedStrip, printerName]);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
