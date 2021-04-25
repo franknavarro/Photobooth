@@ -1,6 +1,6 @@
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import AppSetup from './pages/AppSetup';
-import Settings from './pages/Settings';
+import Settings from './pages/Settings/Settings';
 import useStore from './hooks/useStore';
 
 const App = () => {
@@ -9,7 +9,7 @@ const App = () => {
     <BrowserRouter>
       <Switch>
         <Route path="/settings">
-          <Settings initialStore={store} />
+          <Settings store={store} />
         </Route>
         <Route path="/">
           <AppSetup store={store} />
