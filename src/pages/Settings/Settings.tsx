@@ -6,7 +6,7 @@ import SettingsAppBar from './SettingsAppBar';
 import SettingsNavigation, { drawerWidth } from './SettingsNavigation';
 import settingsTheme from './settingsTheme';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -16,8 +16,9 @@ const useStyles = makeStyles({
   main: {
     flex: 1,
     marginLeft: drawerWidth,
+    padding: theme.spacing(3),
   },
-});
+}));
 
 interface SettingsProps {
   store: PhotoboothStore;

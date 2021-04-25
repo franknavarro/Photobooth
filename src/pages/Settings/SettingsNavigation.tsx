@@ -8,7 +8,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 export const drawerWidth = 150;
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -19,7 +19,17 @@ const useStyles = makeStyles({
   drawerContainer: {
     overflow: 'auto',
   },
-});
+  listItem: {
+    padding: `0 ${theme.spacing(3)}px`,
+  },
+  list: {
+    padding: 0,
+    paddingTop: theme.spacing(3),
+  },
+  listText: {
+    margin: 0,
+  },
+}));
 
 const SettingsNavigation: FC = () => {
   const classes = useStyles();
@@ -33,10 +43,10 @@ const SettingsNavigation: FC = () => {
     >
       <Toolbar />
       <div className={classes.drawerContainer}>
-        <List>
+        <List className={classes.list}>
           {['Photostrip', 'Interface', 'Printer'].map((text) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+            <ListItem button key={text} className={classes.listItem}>
+              <ListItemText primary={text} className={classes.listText} />
             </ListItem>
           ))}
         </List>
