@@ -5,6 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import SettingsAppBar from './SettingsAppBar';
 import SettingsNavigation, { drawerWidth } from './SettingsNavigation';
 import settingsTheme from './settingsTheme';
+import useStore from '../../hooks/useStore';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,12 +21,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface SettingsProps {
-  store: PhotoboothStore;
-}
-
-const Settings: FC<SettingsProps> = () => {
+const Settings: FC = () => {
   const classes = useStyles();
+  const store = useStore();
   return (
     <ThemeProvider theme={settingsTheme}>
       <CssBaseline />

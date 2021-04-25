@@ -5,12 +5,10 @@ import ErrorMessage from './ErrorMessage';
 import Loading from './Loading';
 import MainApp from './MainApp';
 import theme from '../theme';
+import useStore from '../hooks/useStore';
 
-interface AppSetupProps {
-  store: PhotoboothStore;
-}
-
-const AppSetup: FC<AppSetupProps> = ({ store }) => {
+const AppSetup: FC = () => {
+  const store = useStore();
   const [ready, setReady] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 

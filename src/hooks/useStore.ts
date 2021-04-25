@@ -1,13 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useRef } from 'react';
 
-const useStore = (): [PhotoboothStore, () => void] => {
-  const [store, setStore] = useState<PhotoboothStore>(window.store.store);
+const useStore = (): PhotoboothStore => {
+  const store = useRef<PhotoboothStore>(window.store.store);
 
-  const refreshStore = useCallback(() => {
-    setStore(window.store.store);
-  }, []);
-
-  return [store, refreshStore];
+  return store.current;
 };
 
 export default useStore;
