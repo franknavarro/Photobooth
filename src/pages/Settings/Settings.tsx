@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import SettingsAppBar from './SettingsAppBar';
+import SettingsNavigation, { drawerWidth } from './SettingsNavigation';
 import settingsTheme from './settingsTheme';
 
 const useStyles = makeStyles({
@@ -14,6 +15,7 @@ const useStyles = makeStyles({
   },
   main: {
     flex: 1,
+    marginLeft: drawerWidth,
   },
 });
 
@@ -28,7 +30,8 @@ const Settings: FC<SettingsProps> = () => {
       <CssBaseline />
       <div className={classes.root}>
         <SettingsAppBar />
-        <div className={classes.main}>Settings Page</div>
+        <SettingsNavigation />
+        <main className={classes.main}>Settings Page</main>
       </div>
     </ThemeProvider>
   );
