@@ -8,7 +8,7 @@ import {
   SetStateAction,
 } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PhotostripList } from '../Router';
+import { PhotostripList } from './MainApp';
 import useCountDown from '../hooks/useCountDown';
 import useLivePreview from '../hooks/useLivePreview';
 import FlexBox from '../components/FlexBox';
