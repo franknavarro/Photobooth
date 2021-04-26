@@ -2,6 +2,8 @@ import { FC } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Paper from '@material-ui/core/Paper';
+import PhotostripSettings from './PhotostripSettings';
 import SettingsAppBar from './SettingsAppBar';
 import SettingsNavigation, { drawerWidth } from './SettingsNavigation';
 import settingsTheme from './settingsTheme';
@@ -27,11 +29,13 @@ const Settings: FC = () => {
   return (
     <ThemeProvider theme={settingsTheme}>
       <CssBaseline />
-      <div className={classes.root}>
+      <Paper className={classes.root}>
         <SettingsAppBar />
         <SettingsNavigation />
-        <main className={classes.main}>Settings Page</main>
-      </div>
+        <main className={classes.main}>
+          <PhotostripSettings settings={store.photostrip} />
+        </main>
+      </Paper>
     </ThemeProvider>
   );
 };
