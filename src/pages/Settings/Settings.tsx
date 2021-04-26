@@ -5,6 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import InterfaceSettings from './InterfaceSettings';
 import Paper from '@material-ui/core/Paper';
 import PhotostripSettings from './PhotostripSettings';
+import PrinterSettings from './PrinterSettings';
 import SettingsAppBar from './SettingsAppBar';
 import SettingsNavigation, { drawerWidth } from './SettingsNavigation';
 import settingsTheme from './settingsTheme';
@@ -36,6 +37,7 @@ const Settings: FC = () => {
         <main className={classes.main}>
           <PhotostripSettings settings={store.photostrip} />
           <InterfaceSettings settings={store.interface} />
+          <PrinterSettings settings={store.printer} />
         </main>
       </Paper>
     </ThemeProvider>

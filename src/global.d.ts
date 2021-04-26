@@ -24,6 +24,7 @@ interface Window {
       file: string,
     ) => Promise<void>;
     status: () => Promise<boolean>;
+    list: () => Promise<string[]>;
   };
   standard: {
     hrtime: NodeJS.HRTime;

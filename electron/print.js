@@ -1,23 +1,24 @@
 const { ipcMain } = require('electron');
-const { exec } = require('child_process');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 ipcMain.handle('start-print', async (_, printer, printFile) => {
-  return await new Promise((result, reject) => {
-    exec(`lp -d ${printer} ${printFile}`, (error, _, stderr) => {
-      if (error) return reject(error);
-      else if (stderr) return reject(stderr);
-      return result();
-    });
-  });
+  const { stderr } = await exec(`lp -d ${printer} ${printFile}`);
+  if (stderr) throw new Error(stderr);
+  return;
 });
 
 ipcMain.handle('print-status', async () => {
-  return await new Promise((result, reject) => {
-    exec('lpstat', (error, stdout, stderr) => {
-      if (error) return reject(error);
-      else if (stderr) return reject(stderr);
-      if (stdout) return result(true);
-      else return result(false);
-    });
-  });
+  const { stdout, stderr } = await exec('lpstat');
+  if (stderr) throw new Error(stderr);
+  else if (stdout) return true;
+  return false;
+});
+
+ipcMain.handle('printer-list', async () => {
+  const { stdout, stderr } = await exec('lpstat -p');
+  if (stderr) throw new Error(stderr);
+  const printers = stdout.split('\n').filter((p) => p);
+  if (!printers.length) return [];
+  return printers.map((p) => p.split(/\s+/)[1]);
 });
