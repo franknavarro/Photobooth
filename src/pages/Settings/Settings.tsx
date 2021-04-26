@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import InterfaceSettings from './InterfaceSettings';
 import Paper from '@material-ui/core/Paper';
 import PhotostripSettings from './PhotostripSettings';
 import SettingsAppBar from './SettingsAppBar';
@@ -34,6 +35,7 @@ const Settings: FC = () => {
         <SettingsNavigation />
         <main className={classes.main}>
           <PhotostripSettings settings={store.photostrip} />
+          <InterfaceSettings settings={store.interface} />
         </main>
       </Paper>
     </ThemeProvider>

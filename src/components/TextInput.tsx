@@ -15,6 +15,7 @@ interface TextInputProps
   setId: string;
   validations: Validation[];
   parser?: (value: any) => any;
+  value: string | number;
 }
 
 const TextInput: FC<TextInputProps> = ({
@@ -25,8 +26,9 @@ const TextInput: FC<TextInputProps> = ({
   ...props
 }) => {
   const classes = useStyles();
-  const [controlledValue, setControlledValue] = useState(value);
+  const [controlledValue, setControlledValue] = useState(value.toString());
   const [error, setError] = useState('');
+  console.log({ controlledValue, setId, value });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;

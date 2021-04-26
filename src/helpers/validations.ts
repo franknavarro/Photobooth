@@ -20,6 +20,13 @@ export const floatError: Validation = {
   error: 'Must be a whole number.',
 };
 
+export const getGreaterError = (moreThan: number): Validation => {
+  return {
+    rule: (value: string) => Number(value) < moreThan,
+    error: `Must be a number greater than or equal to ${moreThan}.`,
+  };
+};
+
 export const getBetweenError = (
   moreThan: number,
   lessThan: number,
