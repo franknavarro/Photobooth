@@ -4,6 +4,7 @@ import {
   floatError,
   getGreaterError,
 } from '../../helpers/validations';
+import ColorInput from '../../components/ColorInput';
 import TextInput from '../../components/TextInput';
 import Typography from '@material-ui/core/Typography';
 
@@ -17,6 +18,16 @@ const InterfaceSettings: FC<InterfaceSettingsProps> = ({ settings }) => {
   return (
     <div>
       <Typography variant="h4">Interface</Typography>
+      <ColorInput
+        setId="interface.primaryColor"
+        label="Primary Color"
+        value={settings.primaryColor}
+      />
+      <ColorInput
+        setId="interface.secondaryColor"
+        label="Secondary Color"
+        value={settings.secondaryColor}
+      />
       <TextInput
         setId="interface.initialCount"
         label="Initial Count Seconds"

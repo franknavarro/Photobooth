@@ -53,6 +53,14 @@ const store = new Store({
       type: 'object',
       default: {},
       properties: {
+        primaryColor: {
+          type: 'string',
+          default: '#FFD7E4',
+        },
+        secondaryColor: {
+          type: 'string',
+          default: '#A4C2FF',
+        },
         initialCount: {
           type: 'number',
           default: 6,

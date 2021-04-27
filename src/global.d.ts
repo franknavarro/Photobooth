@@ -29,5 +29,8 @@ interface Window {
   standard: {
     hrtime: NodeJS.HRTime;
   };
-  store: Pick<Store, 'store' | 'set'>;
+  store: {
+    set: Store['set'];
+    store: () => Store['store'];
+  };
 }

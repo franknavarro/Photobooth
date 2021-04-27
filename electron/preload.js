@@ -40,6 +40,6 @@ contextBridge.exposeInMainWorld('printer', {
 });
 
 contextBridge.exposeInMainWorld('store', {
-  store: store.store,
+  store: () => store.store,
   set: (dotString, value) => store.set(dotString, value),
 });

@@ -12,6 +12,8 @@ interface PhotostripStore {
     };
   };
   interface: {
+    primaryColor: string;
+    secondaryColor: string;
     initialCount: number;
     countTime: number;
     waitTime: number;
