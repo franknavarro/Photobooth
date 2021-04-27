@@ -15,6 +15,7 @@ import FlexBox from '../components/FlexBox';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
 import Grid, { GridSize } from '@material-ui/core/Grid';
+import ResponsiveImage from '../components/ResponsiveImage';
 
 const useStyles = makeStyles((theme) => ({
   view: {
@@ -101,42 +102,35 @@ const TakePictures: FC<TakePicturesProps> = ({
       history.push('/selection');
     };
     if (photos.length === maxPhotos && photostrips.length === 0) {
-      createStrips();
+      // createStrips();
     } else if (photos.length === 0 && photostrips.length !== 0) {
       setPhotostrips([]);
     }
   }, [photos, history, photostrips, setPhotostrips, maxPhotos]);
 
+  let countText;
+  if (count === startingCount) countText = 'Get Ready...';
+  else if (count) countText = count;
+  else if (takingPhoto) countText = 'SNAP';
+  else countText = 'Looking Good!';
+
   return (
     <FullScreen>
       <FlexBox />
       {(preview && run) || !takingPhoto ? (
-        <img
+        <ResponsiveImage
+          decorated
           src={`image://${run ? preview : photos[photos.length - 1]}`}
-          className={classes.view}
-          alt=""
         />
       ) : (
         <div className={classes.view} />
       )}
-      <FlexText>
-        {count === startingCount
-          ? 'Get Ready...'
-          : count
-          ? count
-          : takingPhoto
-          ? 'SNAP'
-          : 'Looking Good!'}
-      </FlexText>
+      <FlexText>{countText}</FlexText>
       <Grid container spacing={3} className={classes.photoPreview}>
         {photos.map((photo, index) => {
           return (
             <Grid item xs={gridSize} key={index}>
-              <img
-                src={`image://${photo}`}
-                alt={`${index + 1}`}
-                className={classes.photo}
-              />
+              <ResponsiveImage src={`image://${photo}`} />
             </Grid>
           );
         })}
