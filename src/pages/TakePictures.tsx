@@ -102,7 +102,7 @@ const TakePictures: FC<TakePicturesProps> = ({
       history.push('/selection');
     };
     if (photos.length === maxPhotos && photostrips.length === 0) {
-      // createStrips();
+      createStrips();
     } else if (photos.length === 0 && photostrips.length !== 0) {
       setPhotostrips([]);
     }

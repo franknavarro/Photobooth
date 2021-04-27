@@ -8,6 +8,7 @@ const WHITE_BOX = {
   background: { r: 255, g: 255, b: 255 },
 };
 
+let photostripTemplate;
 let photostrip;
 let imageResize;
 let border = {
@@ -49,6 +50,7 @@ ipcMain.handle(
           .jpeg()
           .toBuffer();
       }
+      photostripTemplate = photostrip;
       const imgMetadata = await sharp(testImg).metadata();
       const imageSize = extractSize(imgMetadata);
 
@@ -131,6 +133,7 @@ ipcMain.handle('create-strips', async () => {
         .withMetadata()
         .toFile(path);
     });
+    photostrip = photostripTemplate;
     await Promise.all(stripsPromise);
     return stripsList.map(({ path, description }) => ({ path, description }));
   } catch (error) {
