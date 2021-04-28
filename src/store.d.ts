@@ -14,10 +14,11 @@ interface PhotostripStore {
     };
   };
   interface: {
+    countTime: number;
+    initialCount: number;
+    photoPreview: 'none' | 'top' | 'bottom' | 'left' | 'right';
     primaryColor: string;
     secondaryColor: string;
-    initialCount: number;
-    countTime: number;
     waitTime: number;
   };
   printer: {

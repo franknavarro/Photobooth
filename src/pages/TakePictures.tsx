@@ -9,28 +9,63 @@ import {
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PhotostripList } from './MainApp';
+import clsx from 'clsx';
 import useCountDown from '../hooks/useCountDown';
 import useLivePreview from '../hooks/useLivePreview';
-import FlexBox from '../components/FlexBox';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
-import Grid, { GridSize } from '@material-ui/core/Grid';
 import ResponsiveImage from '../components/ResponsiveImage';
 
 const useStyles = makeStyles((theme) => ({
+  mainView: {
+    flex: 5,
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    flexDirection: 'column',
+    padding: theme.spacing(3),
+  },
+  mainTop: {
+    flexDirection: 'column-reverse',
+    paddingTop: theme.spacing(3),
+  },
+  mainBottom: {
+    flexDirection: 'column',
+    paddingBottom: theme.spacing(3),
+  },
+  mainLeft: {
+    flexDirection: 'row-reverse',
+    paddingLeft: theme.spacing(3),
+  },
+  mainRight: {
+    flexDirection: 'row',
+    paddingRight: theme.spacing(3),
+  },
   view: {
     flex: 5,
     height: '100%',
     width: '100%',
   },
   photoPreview: {
-    flex: 2,
+    flex: 1,
     width: '100%',
-    margin: 0,
+    height: '100%',
   },
-  photo: {
-    maxWidth: '100%',
-    borderRadius: theme.spacing(3),
+  horizontalPreview: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  verticalPreview: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  noPreview: {
+    display: 'none',
+  },
+  previewBox: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
 }));
 
@@ -42,6 +77,7 @@ interface TakePicturesProps {
   photostrips: PhotostripList;
   setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
   ratio: ImageRatio;
+  photoPreview: PhotoboothStore['interface']['photoPreview'];
 }
 
 const TakePictures: FC<TakePicturesProps> = ({
@@ -51,6 +87,7 @@ const TakePictures: FC<TakePicturesProps> = ({
   maxPhotos,
   photostrips,
   setPhotostrips,
+  photoPreview,
   ratio,
 }) => {
   const classes = useStyles();
@@ -59,7 +96,6 @@ const TakePictures: FC<TakePicturesProps> = ({
   const [count, resetCount] = useCountDown(initialCount);
   const [photos, setPhotos] = useState<string[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
-  const gridSize = Math.round(12 / maxPhotos) as GridSize;
   const startingCount = photos.length ? countTime : initialCount;
 
   const reset = useCallback((): void => {
@@ -116,27 +152,46 @@ const TakePictures: FC<TakePicturesProps> = ({
   else countText = 'Looking Good!';
 
   return (
-    <FullScreen>
-      <FlexBox />
-      <div className={classes.view}>
-        {((preview && run) || !takingPhoto) && (
-          <ResponsiveImage
-            decorated
-            ratio={ratio}
-            src={`image://${run ? preview : photos[photos.length - 1]}`}
-          />
-        )}
+    <FullScreen
+      className={clsx({
+        [classes.mainTop]: photoPreview === 'top',
+        [classes.mainBottom]: photoPreview === 'bottom',
+        [classes.mainLeft]: photoPreview === 'left',
+        [classes.mainRight]: photoPreview === 'right',
+      })}
+    >
+      <div className={classes.mainView}>
+        <div className={classes.view}>
+          {((preview && run) || !takingPhoto) && (
+            <ResponsiveImage
+              decorated
+              ratio={ratio}
+              src={`image://${run ? preview : photos[photos.length - 1]}`}
+            />
+          )}
+        </div>
+        <FlexText>{countText}</FlexText>
       </div>
-      <FlexText>{countText}</FlexText>
-      <Grid container spacing={3} className={classes.photoPreview}>
-        {photos.map((photo, index) => {
-          return (
-            <Grid item xs={gridSize} key={index}>
-              <ResponsiveImage ratio={ratio} src={`image://${photo}`} />
-            </Grid>
-          );
+      <div
+        className={clsx(classes.photoPreview, {
+          [classes.horizontalPreview]:
+            photoPreview === 'top' || photoPreview === 'bottom',
+          [classes.verticalPreview]:
+            photoPreview === 'left' || photoPreview === 'right',
+          [classes.noPreview]: photoPreview === 'none',
         })}
-      </Grid>
+      >
+        {[...Array(maxPhotos)].map((_, photoI) => (
+          <div className={classes.previewBox} key={photoI}>
+            {photoI < photos.length && (
+              <ResponsiveImage
+                ratio={ratio}
+                src={`image://${photos[photoI]}`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
     </FullScreen>
   );
 };

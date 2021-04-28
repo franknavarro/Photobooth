@@ -52,6 +52,7 @@ const MainApp: FC<MainAppProps> = ({ store, ratio }) => {
           photostrips={photostrips}
           setPhotostrips={setPhotostrips}
           ratio={ratio}
+          photoPreview={store.interface.photoPreview}
         />
       </Route>
       <Route path="/">

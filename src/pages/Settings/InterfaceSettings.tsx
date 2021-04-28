@@ -5,6 +5,7 @@ import {
   getGreaterError,
 } from '../../helpers/validations';
 import ColorInput from '../../components/ColorInput';
+import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
 import Typography from '@material-ui/core/Typography';
 
@@ -13,7 +14,6 @@ interface InterfaceSettingsProps {
 }
 
 const InterfaceSettings: FC<InterfaceSettingsProps> = ({ settings }) => {
-  console.log(settings);
   const parsePlus1 = (v: string) => parseInt(v) + 1;
   return (
     <div>
@@ -27,6 +27,18 @@ const InterfaceSettings: FC<InterfaceSettingsProps> = ({ settings }) => {
         setId="interface.secondaryColor"
         label="Secondary Color"
         value={settings.secondaryColor}
+      />
+      <SelectInput
+        label="Show Photo Preview"
+        setId="interface.photoPreview"
+        value={settings.photoPreview}
+        items={[
+          { value: 'none', label: 'None' },
+          { value: 'top', label: 'Top' },
+          { value: 'bottom', label: 'Bottom' },
+          { value: 'left', label: 'Left' },
+          { value: 'right', label: 'Right' },
+        ]}
       />
       <TextInput
         setId="interface.initialCount"

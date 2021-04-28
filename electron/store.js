@@ -63,6 +63,21 @@ const store = new Store({
       type: 'object',
       default: {},
       properties: {
+        countTime: {
+          type: 'number',
+          default: 4,
+          minimum: 1,
+        },
+        initialCount: {
+          type: 'number',
+          default: 6,
+          minimum: 1,
+        },
+        photoPreview: {
+          type: 'string',
+          default: 'none',
+          enum: ['none', 'top', 'bottom', 'left', 'right'],
+        },
         primaryColor: {
           type: 'string',
           default: '#FFD7E4',
@@ -70,16 +85,6 @@ const store = new Store({
         secondaryColor: {
           type: 'string',
           default: '#A4C2FF',
-        },
-        initialCount: {
-          type: 'number',
-          default: 6,
-          minimum: 1,
-        },
-        countTime: {
-          type: 'number',
-          default: 4,
-          minimum: 1,
         },
         waitTime: {
           type: 'number',
