@@ -4,7 +4,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 const { store } = require('./store');
 
 contextBridge.exposeInMainWorld('camera', {
-  initialize: () => ipcRenderer.invoke('initialize-camera'),
+  initialize: async () => {
+    await ipcRenderer.invoke('initialize-camera');
+    const testImage = await ipcRenderer.invoke('take-photo');
+    ipcRenderer.send('delete-img', testImage);
+  },
   getPreview: () => ipcRenderer.invoke('get-preview'),
   takePhoto: async (position) => {
     const image = await ipcRenderer.invoke('take-photo');
@@ -19,16 +23,8 @@ contextBridge.exposeInMainWorld('standard', {
 });
 
 contextBridge.exposeInMainWorld('photostrip', {
-  initialize: async (stripImage, borderSize, stripSize) => {
-    const testImg = await ipcRenderer.invoke('take-photo');
-    await ipcRenderer.invoke(
-      'initialize-strip',
-      stripImage,
-      testImg,
-      borderSize,
-      stripSize,
-    );
-    ipcRenderer.send('delete-img', testImg);
+  initialize: async (settings) => {
+    return await ipcRenderer.invoke('initialize-strip', settings);
   },
   createStrips: () => ipcRenderer.invoke('create-strips'),
 });

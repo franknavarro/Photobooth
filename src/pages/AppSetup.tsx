@@ -9,6 +9,10 @@ import useStore from '../hooks/useStore';
 const AppSetup: FC = () => {
   const store = useStore();
   const [ready, setReady] = useState<boolean>(false);
+  const [cameraRatio, setCameraRatio] = useState<ImageRatio>({
+    width: 3,
+    height: 2,
+  });
   const [error, setError] = useState<string>('');
   const theme = useRef(
     createMuiTheme({
@@ -26,11 +30,8 @@ const AppSetup: FC = () => {
   const initializeApp = useCallback(async () => {
     try {
       await window.camera.initialize();
-      await window.photostrip.initialize(
-        store.photostrip.stripImage,
-        store.photostrip.borders,
-        store.photostrip.stripSize,
-      );
+      const ratio = await window.photostrip.initialize(store.photostrip);
+      setCameraRatio(ratio);
       setReady(true);
     } catch (err) {
       const messages = err.toString().split(':');
@@ -54,7 +55,7 @@ const AppSetup: FC = () => {
       {error ? (
         <ErrorMessage retry={reInitialize} message={error} />
       ) : ready ? (
-        <MainApp store={store} />
+        <MainApp store={store} ratio={cameraRatio} />
       ) : (
         <Loading text="Getting photobooth ready..." />
       )}

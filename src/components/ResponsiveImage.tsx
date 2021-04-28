@@ -1,36 +1,24 @@
-import { FC } from 'react';
+import { FC, useState, useRef, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
+import { debounce } from 'throttle-debounce';
 
 const useStyles = makeStyles((theme) => ({
   imageContainer: {
-    flex: 5,
-    position: 'relative',
     width: '100%',
     height: '100%',
   },
-  stretchImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    display: 'flex',
-  },
-  stretchImageDecorated: {
+  imageContainerDecorated: {
     padding: `0 ${theme.spacing(5)}px`,
   },
-  resizeImage: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    margin: 'auto',
-    aspectRatio: '3 / 2',
+  imageSizer: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    minWidth: '100%',
-    minHeight: '100%',
     borderRadius: theme.spacing(3),
     objectFit: 'cover',
   },
@@ -41,30 +29,59 @@ const useStyles = makeStyles((theme) => ({
 
 interface ResponsiveImageProps {
   src: string;
+  ratio: ImageRatio;
   decorated?: boolean;
 }
 
 const ResponsiveImage: FC<ResponsiveImageProps> = ({
   src,
+  ratio,
   decorated = false,
 }) => {
   const classes = useStyles();
+  const [imageSize, resizeImage] = useState<ImageRatio>({
+    height: 0,
+    width: 0,
+  });
+  const container = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const resize = () => {
+      const defaultSize = { clientHeight: 0, clientWidth: 0 };
+      const { clientHeight, clientWidth } = container.current || defaultSize;
+      const { width, height } = ratio;
+      const widthCalc: ImageRatio = {
+        width: (clientHeight * width) / height,
+        height: clientHeight,
+      };
+      const heightCalc: ImageRatio = {
+        width: clientWidth,
+        height: (clientWidth * height) / width,
+      };
+      resizeImage(widthCalc.width <= clientWidth ? widthCalc : heightCalc);
+    };
+    resize();
+    const debounceResize = debounce(300, false, resize);
+    window.addEventListener('resize', debounceResize);
+
+    return () => window.removeEventListener('resize', debounceResize);
+  }, [ratio]);
+
   return (
-    <div className={classes.imageContainer}>
-      <div
-        className={clsx(classes.stretchImage, {
-          [classes.stretchImageDecorated]: decorated,
-        })}
-      >
-        <div className={classes.resizeImage}>
-          <img
-            className={clsx(classes.image, {
-              [classes.imageDecorated]: decorated,
-            })}
-            src={src}
-            alt=""
-          />
-        </div>
+    <div
+      className={clsx(classes.imageContainer, {
+        [classes.imageContainerDecorated]: decorated,
+      })}
+    >
+      <div className={classes.imageSizer} ref={container}>
+        <img
+          style={imageSize}
+          className={clsx(classes.image, {
+            [classes.imageDecorated]: decorated,
+          })}
+          src={src}
+          alt=""
+        />
       </div>
     </div>
   );

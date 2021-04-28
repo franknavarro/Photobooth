@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
   input: {
     margin: `${theme.spacing(2)}px 0`,
     display: 'flex',
+    width: '100%',
   },
 }));
 
@@ -28,7 +29,6 @@ const TextInput: FC<TextInputProps> = ({
   const classes = useStyles();
   const [controlledValue, setControlledValue] = useState(value.toString());
   const [error, setError] = useState('');
-  console.log({ controlledValue, setId, value });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;

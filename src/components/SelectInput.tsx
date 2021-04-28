@@ -45,6 +45,7 @@ const SelectInput: FC<SelectInputProps> = ({
   const valueInItems = itemList.findIndex(
     (item) => item.value === controlledValue,
   );
+  console.log({ value, controlledValue, valueInItems, itemList });
   const htmlId = setId.replaceAll('.', '-');
 
   const handleChange: SelectProps['onChange'] = (event) => {

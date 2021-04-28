@@ -22,11 +22,21 @@ const store = new Store({
             },
           },
         },
+        logoPosition: {
+          type: 'string',
+          default: 'none',
+          enum: ['top', 'bottom', 'none'],
+        },
         maxPhotos: {
           type: 'number',
           default: 3,
           minimum: 1,
           maximum: 4,
+        },
+        photoSize: {
+          type: 'string',
+          default: 'evenly',
+          enum: ['evenly', '3x2'],
         },
         stripImage: {
           type: 'string',

@@ -4,7 +4,9 @@ interface PhotostripStore {
       horizontal: number;
       vertical: number;
     };
+    photoSize: 'evenly' | '3x2';
     maxPhotos: number;
+    logoPosition: 'none' | 'top' | 'bottom';
     stripImage: string;
     stripSize: {
       height: 6;

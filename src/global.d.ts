@@ -3,6 +3,11 @@ type PhotoboothStore = import('./store');
 
 type Store = import('electron-store')<PhotoboothStore>;
 
+type ImageRatio = {
+  width: number;
+  height: number;
+};
+
 interface Window {
   camera: {
     initialize: () => Promise<void>;
@@ -12,10 +17,8 @@ interface Window {
   };
   photostrip: {
     initialize: (
-      stripImage: PhotoboothStore['photostrip']['stripImage'],
-      borderSize: PhotoboothStore['photostrip']['borders'],
-      stripSize: PhotoboothStore['photostrip']['stripSize'],
-    ) => Promise<void>;
+      settings: PhotoboothStore['photostrip'],
+    ) => Promise<ImageRatio>;
     createStrips: () => Promise<PhotostripList>;
   };
   printer: {

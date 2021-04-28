@@ -19,13 +19,12 @@ import ResponsiveImage from '../components/ResponsiveImage';
 
 const useStyles = makeStyles((theme) => ({
   view: {
-    width: `calc(100% - ${theme.spacing(5)}px)`,
-    border: `${theme.spacing()}px solid white`,
-    borderRadius: theme.spacing(3),
-    backgroundColor: 'white',
+    flex: 5,
+    height: '100%',
+    width: '100%',
   },
   photoPreview: {
-    minHeight: '190px',
+    flex: 2,
     width: '100%',
     margin: 0,
   },
@@ -42,6 +41,7 @@ interface TakePicturesProps {
   maxPhotos: PhotoboothStore['photostrip']['maxPhotos'];
   photostrips: PhotostripList;
   setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
+  ratio: ImageRatio;
 }
 
 const TakePictures: FC<TakePicturesProps> = ({
@@ -51,6 +51,7 @@ const TakePictures: FC<TakePicturesProps> = ({
   maxPhotos,
   photostrips,
   setPhotostrips,
+  ratio,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -117,20 +118,21 @@ const TakePictures: FC<TakePicturesProps> = ({
   return (
     <FullScreen>
       <FlexBox />
-      {(preview && run) || !takingPhoto ? (
-        <ResponsiveImage
-          decorated
-          src={`image://${run ? preview : photos[photos.length - 1]}`}
-        />
-      ) : (
-        <div className={classes.view} />
-      )}
+      <div className={classes.view}>
+        {((preview && run) || !takingPhoto) && (
+          <ResponsiveImage
+            decorated
+            ratio={ratio}
+            src={`image://${run ? preview : photos[photos.length - 1]}`}
+          />
+        )}
+      </div>
       <FlexText>{countText}</FlexText>
       <Grid container spacing={3} className={classes.photoPreview}>
         {photos.map((photo, index) => {
           return (
             <Grid item xs={gridSize} key={index}>
-              <ResponsiveImage src={`image://${photo}`} />
+              <ResponsiveImage ratio={ratio} src={`image://${photo}`} />
             </Grid>
           );
         })}

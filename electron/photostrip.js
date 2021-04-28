@@ -11,6 +11,7 @@ const WHITE_BOX = {
 let photostripTemplate;
 let photostrip;
 let imageResize;
+let imagePositions = [];
 let border = {
   horizontal: 0,
   vertical: 0,
@@ -20,71 +21,80 @@ let photostripSize = {
   height: 6 * DPI,
 };
 
-const extractSize = ({ width, height }) => ({ width, height });
+ipcMain.handle('initialize-strip', async (_, settings) => {
+  const {
+    borders,
+    logoPosition,
+    maxPhotos,
+    photoSize,
+    stripImage,
+    stripSize,
+  } = settings;
 
-ipcMain.handle(
-  'initialize-strip',
-  async (_, stripImage, testImg, borderSize, stripSize) => {
-    try {
-      border = {
-        horizontal: borderSize.horizontal,
-        vertical: borderSize.vertical,
-      };
-      photostripSize = {
-        width: stripSize.width * DPI,
-        height: stripSize.height * DPI,
-      };
+  border = {
+    horizontal: borders.horizontal,
+    vertical: borders.vertical,
+  };
+  photostripSize = {
+    width: stripSize.width * DPI,
+    height: stripSize.height * DPI,
+  };
 
-      if (stripImage) {
-        photostrip = await sharp(stripImage)
-          .jpeg()
-          .resize({ ...photostripSize })
-          .toBuffer();
-      } else {
-        photostrip = await sharp({
-          create: {
-            ...photostripSize,
-            ...WHITE_BOX,
-          },
-        })
-          .jpeg()
-          .toBuffer();
-      }
-      photostripTemplate = photostrip;
-      const imgMetadata = await sharp(testImg).metadata();
-      const imageSize = extractSize(imgMetadata);
+  if (stripImage) {
+    photostrip = await sharp(stripImage)
+      .jpeg()
+      .resize({ ...photostripSize })
+      .toBuffer();
+  } else {
+    photostrip = await sharp({
+      create: {
+        ...photostripSize,
+        ...WHITE_BOX,
+      },
+    })
+      .jpeg()
+      .toBuffer();
+  }
+  photostripTemplate = photostrip;
+  const usingPhotos = maxPhotos + (logoPosition === 'none' ? 0 : 1);
+  const photoBoxSize = {
+    width: photostripSize.width - border.horizontal * 2,
+    height: photostripSize.height / usingPhotos - border.vertical * 1.5,
+  };
 
-      const photoBoxSize = {
-        width: photostripSize.width - border.horizontal * 2,
-        height: Math.round(photostripSize.height / 4) - border.vertical * 1.5,
-      };
+  switch (photoSize) {
+    case '3x2':
       imageResize = {
         width: photoBoxSize.width,
-        height: Math.round(
-          (photoBoxSize.width * imageSize.height) / imageSize.width,
-        ),
+        height: (photoBoxSize.width * 2) / 3,
       };
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  },
-);
+      break;
+    default:
+      imageResize = { ...photoBoxSize };
+      break;
+  }
+
+  let topStart = 0;
+  if (logoPosition === 'top') {
+    topStart =
+      photostripSize.height -
+      (imageResize.height + border.vertical * maxPhotos + 1);
+  }
+
+  imagePositions = [...Array(maxPhotos)].map((_, photoI) => ({
+    left: border.vertical,
+    top:
+      topStart + imageResize.height * photoI + border.horizontal * (photoI + 1),
+  }));
+  return { ...imageResize };
+});
 
 ipcMain.handle('add-image', async (_, image, position) => {
   try {
     const newName = image + '.small.jpg';
     await sharp(image).resize(imageResize).toFile(newName);
     photostrip = await sharp(photostrip)
-      .composite([
-        {
-          input: newName,
-          top:
-            border.horizontal * (position + 1) + imageResize.height * position,
-          left: border.vertical,
-        },
-      ])
+      .composite([{ input: newName, ...imagePositions[position] }])
       .toBuffer();
     return newName;
   } catch (error) {
@@ -100,8 +110,7 @@ ipcMain.handle('create-strips', async () => {
       create: {
         width: photostripSize.width * 2,
         height: photostripSize.height,
-        channels: 3,
-        background: { r: 0, g: 0, b: 0 },
+        ...WHITE_BOX,
       },
     });
     const stripsList = [

@@ -13,9 +13,10 @@ export type PhotostripList = PhotostripData[];
 
 interface MainAppProps {
   store: PhotoboothStore;
+  ratio: ImageRatio;
 }
 
-const MainApp: FC<MainAppProps> = ({ store }) => {
+const MainApp: FC<MainAppProps> = ({ store, ratio }) => {
   const history = useHistory();
   const [photostrips, setPhotostrips] = useState<PhotostripList>([]);
   const [selectedStrip, setSelectedStrip] = useState<string>('');
@@ -50,6 +51,7 @@ const MainApp: FC<MainAppProps> = ({ store }) => {
           maxPhotos={store.photostrip.maxPhotos}
           photostrips={photostrips}
           setPhotostrips={setPhotostrips}
+          ratio={ratio}
         />
       </Route>
       <Route path="/">
