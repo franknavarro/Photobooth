@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { forwardRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   negativeError,
@@ -6,6 +6,7 @@ import {
   floatError,
   getBetweenError,
 } from '../../helpers/validations';
+import clsx from 'clsx';
 import FileInput from '../../components/FileInput';
 import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
@@ -23,83 +24,86 @@ const useStyles = makeStyles((theme) => ({
 
 interface PhotostripSettingsProps {
   settings: PhotoboothStore['photostrip'];
+  className?: string;
 }
 
 type StripSize = PhotoboothStore['photostrip']['stripSize'];
 
-const PhotostripSettings: FC<PhotostripSettingsProps> = ({ settings }) => {
-  const classes = useStyles();
-  const sameStripSize = (compare: StripSize): StripSize => {
-    return compare.height === settings.stripSize.height &&
-      compare.width === settings.stripSize.width
-      ? settings.stripSize
-      : compare;
-  };
+const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
+  ({ settings, className }, ref) => {
+    const classes = useStyles();
+    const sameStripSize = (compare: StripSize): StripSize => {
+      return compare.height === settings.stripSize.height &&
+        compare.width === settings.stripSize.width
+        ? settings.stripSize
+        : compare;
+    };
 
-  return (
-    <div>
-      <Typography variant="h4">Photostrip</Typography>
-      <SelectInput
-        label="Photostrip Size (in)"
-        setId="photostrip.stripSize"
-        value={settings.stripSize}
-        items={[
-          { value: sameStripSize({ height: 6, width: 2 }), label: '2 x 6' },
-          { value: sameStripSize({ height: 6, width: 4 }), label: '4 x 6' },
-        ]}
-      />
-      <SelectInput
-        label="Image Size (in)"
-        setId="photostrip.photoSize"
-        value={settings.photoSize}
-        items={[
-          { value: 'evenly', label: 'Split evenly' },
-          { value: '3x2', label: '3 x 2' },
-        ]}
-      />
-      <FileInput
-        setId="photostrip.stripImage"
-        label="Photostrip Image"
-        value={settings.stripImage}
-      />
-      <TextInput
-        setId="photostrip.maxPhotos"
-        label="Max Photos"
-        type="number"
-        value={settings.maxPhotos}
-        validations={[blankError, floatError, getBetweenError(1, 4)]}
-        parser={Number}
-      />
-      <div className={classes.group}>
-        <TextInput
-          setId="photostrip.borders.horizontal"
-          label="Horizontal Borders"
-          type="number"
-          value={settings.borders.horizontal}
-          validations={[negativeError, blankError, floatError]}
-          parser={Number}
+    return (
+      <div ref={ref} className={clsx(className)}>
+        <Typography variant="h4">Photostrip</Typography>
+        <SelectInput
+          label="Photostrip Size (in)"
+          setId="photostrip.stripSize"
+          value={settings.stripSize}
+          items={[
+            { value: sameStripSize({ height: 6, width: 2 }), label: '2 x 6' },
+            { value: sameStripSize({ height: 6, width: 4 }), label: '4 x 6' },
+          ]}
+        />
+        <SelectInput
+          label="Image Size (in)"
+          setId="photostrip.photoSize"
+          value={settings.photoSize}
+          items={[
+            { value: 'evenly', label: 'Split evenly' },
+            { value: '3x2', label: '3 x 2' },
+          ]}
+        />
+        <FileInput
+          setId="photostrip.stripImage"
+          label="Photostrip Image"
+          value={settings.stripImage}
         />
         <TextInput
-          setId="photostrip.borders.vertical"
-          label="Vertical Borders"
+          setId="photostrip.maxPhotos"
+          label="Max Photos"
           type="number"
-          value={settings.borders.vertical}
-          validations={[negativeError, blankError, floatError]}
+          value={settings.maxPhotos}
+          validations={[blankError, floatError, getBetweenError(1, 4)]}
           parser={Number}
+        />
+        <div className={classes.group}>
+          <TextInput
+            setId="photostrip.borders.horizontal"
+            label="Horizontal Borders"
+            type="number"
+            value={settings.borders.horizontal}
+            validations={[negativeError, blankError, floatError]}
+            parser={Number}
+          />
+          <TextInput
+            setId="photostrip.borders.vertical"
+            label="Vertical Borders"
+            type="number"
+            value={settings.borders.vertical}
+            validations={[negativeError, blankError, floatError]}
+            parser={Number}
+          />
+        </div>
+        <SelectInput
+          label="Logo Position"
+          setId="photostrip.logoPosition"
+          value={settings.logoPosition}
+          items={[
+            { value: 'none', label: 'None' },
+            { value: 'top', label: 'Top' },
+            { value: 'bottom', label: 'Bottom' },
+          ]}
         />
       </div>
-      <SelectInput
-        label="Logo Position"
-        setId="photostrip.logoPosition"
-        value={settings.logoPosition}
-        items={[
-          { value: 'none', label: 'None' },
-          { value: 'top', label: 'Top' },
-          { value: 'bottom', label: 'Bottom' },
-        ]}
-      />
-    </div>
-  );
-};
+    );
+  },
+);
 
 export default PhotostripSettings;

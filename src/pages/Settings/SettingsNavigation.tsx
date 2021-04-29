@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, RefObject } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
@@ -31,8 +31,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SettingsNavigation: FC = () => {
+interface SettingsNavigationProps {
+  list: Array<{
+    name: string;
+    ref: RefObject<HTMLDivElement>;
+  }>;
+}
+
+const SettingsNavigation: FC<SettingsNavigationProps> = ({ list }) => {
   const classes = useStyles();
+
+  const scrollToRef = (scrollRef: RefObject<HTMLDivElement>) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <Drawer
       className={classes.drawer}
@@ -44,9 +58,14 @@ const SettingsNavigation: FC = () => {
       <Toolbar />
       <div className={classes.drawerContainer}>
         <List className={classes.list}>
-          {['Photostrip', 'Interface', 'Printer'].map((text) => (
-            <ListItem button key={text} className={classes.listItem}>
-              <ListItemText primary={text} className={classes.listText} />
+          {list.map(({ name, ref }) => (
+            <ListItem
+              button
+              key={name}
+              className={classes.listItem}
+              onClick={() => scrollToRef(ref)}
+            >
+              <ListItemText primary={name} className={classes.listText} />
             </ListItem>
           ))}
         </List>

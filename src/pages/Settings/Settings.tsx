@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -23,21 +23,47 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: drawerWidth,
     padding: theme.spacing(3),
   },
+  settingsSection: {
+    scrollMarginTop: `${theme.mixins.toolbar.minHeight}px`,
+  },
 }));
 
 const Settings: FC = () => {
   const classes = useStyles();
   const store = useStore();
+
+  const photostripRef = useRef<HTMLDivElement>(null);
+  const interfaceRef = useRef<HTMLDivElement>(null);
+  const printerRef = useRef<HTMLDivElement>(null);
+
   return (
     <ThemeProvider theme={settingsTheme}>
       <CssBaseline />
       <Paper className={classes.root}>
         <SettingsAppBar />
-        <SettingsNavigation />
+        <SettingsNavigation
+          list={[
+            { name: 'Photostrip', ref: photostripRef },
+            { name: 'Interface', ref: interfaceRef },
+            { name: 'Printer', ref: printerRef },
+          ]}
+        />
         <main className={classes.main}>
-          <PhotostripSettings settings={store.photostrip} />
-          <InterfaceSettings settings={store.interface} />
-          <PrinterSettings settings={store.printer} />
+          <PhotostripSettings
+            ref={photostripRef}
+            settings={store.photostrip}
+            className={classes.settingsSection}
+          />
+          <InterfaceSettings
+            ref={interfaceRef}
+            settings={store.interface}
+            className={classes.settingsSection}
+          />
+          <PrinterSettings
+            ref={printerRef}
+            settings={store.printer}
+            className={classes.settingsSection}
+          />
         </main>
       </Paper>
     </ThemeProvider>
