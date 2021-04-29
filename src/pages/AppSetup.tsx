@@ -1,13 +1,26 @@
 import { FC, useState, useCallback, useEffect, useRef } from 'react';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  createMuiTheme,
+  makeStyles,
+} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import ErrorMessage from './ErrorMessage';
 import Loading from './Loading';
 import MainApp from './MainApp';
 import useStore from '../hooks/useStore';
 
+const useStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flex: 1,
+    cursor: 'none',
+  },
+});
+
 const AppSetup: FC = () => {
   const store = useStore();
+  const classes = useStyles();
   const [ready, setReady] = useState<boolean>(false);
   const [cameraRatio, setCameraRatio] = useState<ImageRatio>({
     width: 3,
@@ -52,13 +65,15 @@ const AppSetup: FC = () => {
   return (
     <ThemeProvider theme={theme.current}>
       <CssBaseline />
-      {error ? (
-        <ErrorMessage retry={reInitialize} message={error} />
-      ) : ready ? (
-        <MainApp store={store} ratio={cameraRatio} />
-      ) : (
-        <Loading text="Getting photobooth ready..." />
-      )}
+      <div className={classes.root}>
+        {error ? (
+          <ErrorMessage retry={reInitialize} message={error} />
+        ) : ready ? (
+          <MainApp store={store} ratio={cameraRatio} />
+        ) : (
+          <Loading text="Getting photobooth ready..." />
+        )}
+      </div>
     </ThemeProvider>
   );
 };

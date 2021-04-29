@@ -8,8 +8,7 @@ const isDev = !app.isPackaged;
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 1600,
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -20,7 +19,7 @@ function createWindow() {
   else mainWindow.loadFile('../build/index.html');
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
@@ -29,7 +28,6 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 
-  const protocolName = 'image';
   protocol.registerFileProtocol('image', (request, callback) => {
     const url = request.url.substr(8);
     const filePath =
