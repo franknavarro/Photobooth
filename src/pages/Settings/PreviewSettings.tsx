@@ -37,11 +37,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface CameraSettingsProps {
+interface PreviewSettingsProps {
   className?: string;
 }
 
-const CameraSettings = forwardRef<HTMLDivElement, CameraSettingsProps>(
+const PreviewSettings = forwardRef<HTMLDivElement, PreviewSettingsProps>(
   ({ className }, ref) => {
     const classes = useStyles();
     const [run, setRun] = useState<boolean>(false);
@@ -116,7 +116,7 @@ const CameraSettings = forwardRef<HTMLDivElement, CameraSettingsProps>(
 
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Camera</Typography>
+        <Typography variant="h4">Preview</Typography>
         <div className={classes.cameraPreview}>
           <div className={classes.buttons}>
             <Button
@@ -147,4 +147,4 @@ const CameraSettings = forwardRef<HTMLDivElement, CameraSettingsProps>(
   },
 );
 
-export default CameraSettings;
+export default PreviewSettings;

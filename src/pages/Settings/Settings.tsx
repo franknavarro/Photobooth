@@ -1,7 +1,7 @@
 import { FC, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
-import CameraSettings from './CameraSettings';
+import PreviewSettings from './PreviewSettings';
 import CloudSettings from './CloudSettings';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InterfaceSettings from './InterfaceSettings';
@@ -37,7 +37,7 @@ const Settings: FC = () => {
   const photostripRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
   const printerRef = useRef<HTMLDivElement>(null);
-  const cameraRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const cloudRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -50,7 +50,7 @@ const Settings: FC = () => {
             { name: 'Photostrip', ref: photostripRef },
             { name: 'Interface', ref: interfaceRef },
             { name: 'Printer', ref: printerRef },
-            { name: 'Camera', ref: cameraRef },
+            { name: 'Preview', ref: previewRef },
             { name: 'Cloud Backup', ref: cloudRef },
           ]}
         />
@@ -70,7 +70,10 @@ const Settings: FC = () => {
             settings={store.printer}
             className={classes.settingsSection}
           />
-          <CameraSettings ref={cameraRef} className={classes.settingsSection} />
+          <PreviewSettings
+            ref={previewRef}
+            className={classes.settingsSection}
+          />
           <CloudSettings
             ref={cloudRef}
             settings={store.cloud}
