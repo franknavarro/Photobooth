@@ -13,13 +13,14 @@ interface Window {
     initialize: () => Promise<void>;
     deleteImg: (file: string) => Promise<void>;
     getPreview: () => Promise<string>;
-    takePhoto: (index: number) => Promise<string>;
+    takePhoto: (index?: number) => Promise<string>;
   };
   photostrip: {
     initialize: (
       settings: PhotoboothStore['photostrip'],
     ) => Promise<ImageRatio>;
     createStrips: () => Promise<PhotostripList>;
+    sampleStrip: (image: string) => Promise<string>;
   };
   printer: {
     start: (

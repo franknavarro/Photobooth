@@ -12,8 +12,11 @@ contextBridge.exposeInMainWorld('camera', {
   getPreview: () => ipcRenderer.invoke('get-preview'),
   takePhoto: async (position) => {
     const image = await ipcRenderer.invoke('take-photo');
-    const smallImg = await ipcRenderer.invoke('add-image', image, position);
-    return smallImg;
+    if (position !== undefined) {
+      const smallImg = await ipcRenderer.invoke('add-image', image, position);
+      return smallImg;
+    }
+    return image;
   },
   deleteImg: (path) => ipcRenderer.send('delete-img', path),
 });
@@ -27,6 +30,7 @@ contextBridge.exposeInMainWorld('photostrip', {
     return await ipcRenderer.invoke('initialize-strip', settings);
   },
   createStrips: () => ipcRenderer.invoke('create-strips'),
+  sampleStrip: (photo) => ipcRenderer.invoke('sample-strip', photo),
 });
 
 contextBridge.exposeInMainWorld('printer', {

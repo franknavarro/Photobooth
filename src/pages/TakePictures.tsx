@@ -11,9 +11,9 @@ import { useHistory } from 'react-router-dom';
 import { PhotostripList } from './MainApp';
 import clsx from 'clsx';
 import useCountDown from '../hooks/useCountDown';
-import useLivePreview from '../hooks/useLivePreview';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
+import LivePreview from '../components/LivePreview';
 import ResponsiveImage from '../components/ResponsiveImage';
 
 const useStyles = makeStyles((theme) => ({
@@ -92,16 +92,16 @@ const TakePictures: FC<TakePicturesProps> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
-  const [preview, run, setRun] = useLivePreview();
-  const [count, resetCount] = useCountDown(initialCount);
+  const [run, setRun] = useState<boolean>(true);
+  const [count, setCount] = useCountDown(initialCount);
   const [photos, setPhotos] = useState<string[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const startingCount = photos.length ? countTime : initialCount;
 
   const reset = useCallback((): void => {
-    resetCount(countTime);
+    setCount(countTime);
     setRun(true);
-  }, [resetCount, setRun, countTime]);
+  }, [setCount, countTime]);
 
   const takePhoto = useCallback(async (): Promise<ReturnType<
     typeof setTimeout
@@ -115,12 +115,9 @@ const TakePictures: FC<TakePicturesProps> = ({
     if (photos.length < maxPhotos - 1) {
       return setTimeout(reset, waitTime * 1000);
     }
-  }, [photos, reset, setRun, waitTime, maxPhotos]);
+  }, [photos, reset, waitTime, maxPhotos]);
 
-  useEffect(() => {
-    setRun(true);
-  }, [setRun]);
-
+  // Stop live preview and take an image
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     if (!count && run) {
@@ -162,13 +159,12 @@ const TakePictures: FC<TakePicturesProps> = ({
     >
       <div className={classes.mainView}>
         <div className={classes.view}>
-          {((preview && run) || !takingPhoto) && (
-            <ResponsiveImage
-              decorated
-              ratio={ratio}
-              src={`image://${run ? preview : photos[photos.length - 1]}`}
-            />
-          )}
+          <LivePreview
+            ratio={ratio}
+            run={run}
+            hide={takingPhoto}
+            defaultSrc={photos[photos.length - 1]}
+          />
         </div>
         <FlexText>{countText}</FlexText>
       </div>

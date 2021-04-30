@@ -1,6 +1,7 @@
 import { FC, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
+import CameraSettings from './CameraSettings';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InterfaceSettings from './InterfaceSettings';
 import Paper from '@material-ui/core/Paper';
@@ -35,6 +36,7 @@ const Settings: FC = () => {
   const photostripRef = useRef<HTMLDivElement>(null);
   const interfaceRef = useRef<HTMLDivElement>(null);
   const printerRef = useRef<HTMLDivElement>(null);
+  const cameraRef = useRef<HTMLDivElement>(null);
 
   return (
     <ThemeProvider theme={settingsTheme}>
@@ -46,6 +48,7 @@ const Settings: FC = () => {
             { name: 'Photostrip', ref: photostripRef },
             { name: 'Interface', ref: interfaceRef },
             { name: 'Printer', ref: printerRef },
+            { name: 'Camera', ref: cameraRef },
           ]}
         />
         <main className={classes.main}>
@@ -64,6 +67,7 @@ const Settings: FC = () => {
             settings={store.printer}
             className={classes.settingsSection}
           />
+          <CameraSettings ref={cameraRef} className={classes.settingsSection} />
         </main>
       </Paper>
     </ThemeProvider>

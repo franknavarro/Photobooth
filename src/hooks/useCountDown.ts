@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
-type ResetCount = (start: number) => void;
+type CountDownReturn = [number, Dispatch<SetStateAction<number>>];
 
-const useCountDown = (start = 6): [number, ResetCount] => {
+const useCountDown = (start = 6): CountDownReturn => {
   const [count, setCount] = useState<number>(start);
-
-  const resetCount = useCallback<ResetCount>((newStart) => {
-    setCount(newStart);
-  }, []);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -17,7 +13,7 @@ const useCountDown = (start = 6): [number, ResetCount] => {
     return () => clearTimeout(timeout);
   }, [count]);
 
-  return [count, resetCount];
+  return [count, setCount];
 };
 
 export default useCountDown;

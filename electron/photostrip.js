@@ -150,3 +150,11 @@ ipcMain.handle('create-strips', async () => {
     throw new Error('Strips failed to generate...');
   }
 });
+
+ipcMain.handle('sample-strip', async (_, image) => {
+  const input = await sharp(image).resize(imageResize).toBuffer();
+  const composites = imagePositions.map((pos) => ({ input, ...pos }));
+  const samplePath = appendTmp(`sample-strip-${Date.now()}.jpg`);
+  photostrip = await sharp(photostrip).composite(composites).toFile(samplePath);
+  return samplePath;
+});
