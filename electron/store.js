@@ -2,6 +2,28 @@ const Store = require('electron-store');
 
 const store = new Store({
   schema: {
+    cloud: {
+      type: 'object',
+      default: {},
+      properties: {
+        projectId: {
+          type: 'string',
+          default: '',
+        },
+        keyFilename: {
+          type: 'string',
+          default: '',
+        },
+        bucketName: {
+          type: 'string',
+          default: '',
+        },
+        bucketPath: {
+          type: 'string',
+          default: '',
+        },
+      },
+    },
     photostrip: {
       type: 'object',
       default: {},

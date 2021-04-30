@@ -1,9 +1,11 @@
 import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select, { SelectProps } from '@material-ui/core/Select';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -41,6 +43,8 @@ const SelectInput: FC<SelectInputProps> = ({
   const classes = useStyles();
   const [itemList, setItemList] = useState<SelectItem[]>(items);
   const [controlledValue, setControlledValue] = useState<unknown>(value);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   const valueInItems = itemList.findIndex(
     (item) => item.value === controlledValue,
@@ -54,9 +58,24 @@ const SelectInput: FC<SelectInputProps> = ({
   };
 
   useEffect(() => {
-    if (dataFetch) dataFetch(setItemList);
+    const getData = async () => {
+      if (dataFetch) {
+        try {
+          setLoading(true);
+          setError('');
+          await dataFetch(setItemList);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    getData();
   }, [dataFetch]);
 
+  if (loading) return <CircularProgress color="primary" />;
+  if (error) return <Typography>{error}</Typography>;
   return (
     <FormControl className={classes.input}>
       <InputLabel id={`${htmlId}-label`}>{label}</InputLabel>
@@ -67,21 +86,15 @@ const SelectInput: FC<SelectInputProps> = ({
         onChange={handleChange}
         {...props}
       >
-        {itemList.length ? (
-          itemList.map(({ value, label, disabled }, index) => (
-            <MenuItem
-              value={value}
-              key={index}
-              disabled={disabled === undefined ? false : disabled}
-            >
-              {label}
-            </MenuItem>
-          ))
-        ) : (
-          <MenuItem value="" disabled>
-            Loading...
+        {itemList.map(({ value, label, disabled }, index) => (
+          <MenuItem
+            value={value}
+            key={index}
+            disabled={disabled === undefined ? false : disabled}
+          >
+            {label}
           </MenuItem>
-        )}
+        ))}
       </Select>
     </FormControl>
   );

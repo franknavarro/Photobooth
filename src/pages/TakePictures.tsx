@@ -94,7 +94,7 @@ const TakePictures: FC<TakePicturesProps> = ({
   const history = useHistory();
   const [run, setRun] = useState<boolean>(true);
   const [count, setCount] = useCountDown(initialCount);
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<{ full: string; small: string }[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const startingCount = photos.length ? countTime : initialCount;
 
@@ -163,7 +163,7 @@ const TakePictures: FC<TakePicturesProps> = ({
             ratio={ratio}
             run={run}
             hide={takingPhoto}
-            defaultSrc={photos[photos.length - 1]}
+            defaultSrc={photos[photos.length - 1]?.small}
           />
         </div>
         <FlexText>{countText}</FlexText>

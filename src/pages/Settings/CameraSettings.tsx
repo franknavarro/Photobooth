@@ -85,8 +85,8 @@ const CameraSettings = forwardRef<HTMLDivElement, CameraSettingsProps>(
       if (sampleStrip) window.camera.deleteImg(sampleStrip);
       setSampleStrip('');
       const img = await window.camera.takePhoto();
-      const sample = await window.photostrip.sampleStrip(img);
-      window.camera.deleteImg(img);
+      const sample = await window.photostrip.sampleStrip(img.full);
+      window.camera.deleteImg(img.full);
       setSampleStrip(sample);
     }, [sampleStrip]);
 

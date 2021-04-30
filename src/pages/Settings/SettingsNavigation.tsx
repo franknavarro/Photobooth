@@ -6,7 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Toolbar from '@material-ui/core/Toolbar';
 
-export const drawerWidth = 150;
+export const drawerWidth = 175;
 
 const useStyles = makeStyles((theme) => ({
   drawer: {

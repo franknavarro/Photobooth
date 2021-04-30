@@ -1,4 +1,10 @@
 interface PhotostripStore {
+  cloud: {
+    projectId: string;
+    keyFilename: string;
+    bucketName: string;
+    bucketPath: string;
+  };
   photostrip: {
     borders: {
       horizontal: number;

@@ -63,6 +63,7 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
         <FileInput
           setId="photostrip.stripImage"
           label="Photostrip Image"
+          accept="image/*"
           value={settings.stripImage}
         />
         <TextInput

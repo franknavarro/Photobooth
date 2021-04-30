@@ -12,11 +12,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface TextInputProps
-  extends Omit<FilledTextFieldProps, 'variant' | 'id' | 'error'> {
+  extends Omit<FilledTextFieldProps, 'variant' | 'id' | 'error' | 'onChange'> {
   setId: string;
-  validations: Validation[];
+  validations?: Validation[];
   parser?: (value: any) => any;
   value: string | number;
+  onChange?: (text: string) => void;
 }
 
 const TextInput: FC<TextInputProps> = ({
@@ -24,6 +25,7 @@ const TextInput: FC<TextInputProps> = ({
   setId,
   validations,
   parser,
+  onChange,
   ...props
 }) => {
   const classes = useStyles();
@@ -33,14 +35,17 @@ const TextInput: FC<TextInputProps> = ({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     try {
-      const errorIndex = validations.findIndex(({ rule }) => rule(newValue));
-      if (errorIndex !== -1) throw new Error(validations[errorIndex].error);
+      if (validations) {
+        const errorIndex = validations.findIndex(({ rule }) => rule(newValue));
+        if (errorIndex !== -1) throw new Error(validations[errorIndex].error);
+      }
       window.store.set(setId, parser ? parser(newValue) : newValue);
       setError('');
     } catch (err) {
       setError(err.message);
     } finally {
       setControlledValue(newValue);
+      if (onChange) onChange(newValue);
     }
   };
   return (

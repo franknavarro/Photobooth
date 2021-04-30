@@ -24,9 +24,17 @@ interface FileInputProps {
   setId: string;
   label: string;
   value: string;
+  accept?: string;
+  onChange?: (file: string) => void;
 }
 
-const FileInput: FC<FileInputProps> = ({ setId, label, value }) => {
+const FileInput: FC<FileInputProps> = ({
+  setId,
+  label,
+  value,
+  onChange,
+  accept,
+}) => {
   const classes = useStyles();
   const [file, setFile] = useState(value);
   const htmlId = setId.replaceAll('.', '-');
@@ -37,6 +45,7 @@ const FileInput: FC<FileInputProps> = ({ setId, label, value }) => {
       const newFile = (newFiles[0] as FileType).path;
       window.store.set(setId, newFile);
       setFile(newFile);
+      if (onChange) onChange(newFile);
     }
   };
 
@@ -47,7 +56,7 @@ const FileInput: FC<FileInputProps> = ({ setId, label, value }) => {
           Choose File
           <input
             hidden
-            accept="image/*"
+            accept={accept}
             id={htmlId}
             type="file"
             onChange={handleChange}

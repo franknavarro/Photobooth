@@ -55,3 +55,4 @@ Store.initRenderer();
 require('./camera');
 require('./photostrip');
 require('./print');
+require('./cloud');

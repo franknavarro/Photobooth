@@ -12,11 +12,11 @@ contextBridge.exposeInMainWorld('camera', {
   getPreview: () => ipcRenderer.invoke('get-preview'),
   takePhoto: async (position) => {
     const image = await ipcRenderer.invoke('take-photo');
+    const images = { full: image };
     if (position !== undefined) {
-      const smallImg = await ipcRenderer.invoke('add-image', image, position);
-      return smallImg;
+      images['small'] = await ipcRenderer.invoke('add-image', image, position);
     }
-    return image;
+    return images;
   },
   deleteImg: (path) => ipcRenderer.send('delete-img', path),
 });
@@ -37,6 +37,10 @@ contextBridge.exposeInMainWorld('printer', {
   start: (printer, photo) => ipcRenderer.invoke('start-print', printer, photo),
   status: () => ipcRenderer.invoke('print-status'),
   list: () => ipcRenderer.invoke('printer-list'),
+});
+
+contextBridge.exposeInMainWorld('cloud', {
+  getBuckets: (settings) => ipcRenderer.invoke('get-buckets', settings),
 });
 
 contextBridge.exposeInMainWorld('store', {
