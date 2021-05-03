@@ -91,7 +91,7 @@ ipcMain.handle('initialize-strip', async (_, settings) => {
 
 ipcMain.handle('add-image', async (_, image, position) => {
   try {
-    const newName = image + '.small.jpg';
+    const newName = appendTmp(Date.now() + '.jpg');
     await sharp(image).resize(imageResize).toFile(newName);
     photostrip = await sharp(photostrip)
       .composite([{ input: newName, ...imagePositions[position] }])

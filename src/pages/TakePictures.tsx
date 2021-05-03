@@ -71,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 
 interface TakePicturesProps {
   initialCount: PhotoboothStore['interface']['initialCount'];
+  cloudSettings: PhotoboothStore['cloud'];
   countTime: PhotoboothStore['interface']['countTime'];
   waitTime: PhotoboothStore['interface']['waitTime'];
   maxPhotos: PhotoboothStore['photostrip']['maxPhotos'];
@@ -83,6 +84,7 @@ interface TakePicturesProps {
 const TakePictures: FC<TakePicturesProps> = ({
   initialCount,
   countTime,
+  cloudSettings,
   waitTime,
   maxPhotos,
   photostrips,
@@ -133,6 +135,7 @@ const TakePictures: FC<TakePicturesProps> = ({
     const createStrips = async () => {
       const stripData = await window.photostrip.createStrips();
       setPhotostrips([...stripData]);
+      window.cloud.uploadPhotos(cloudSettings, photos, ratio);
       history.push('/selection');
     };
     if (photos.length === maxPhotos && photostrips.length === 0) {
@@ -140,7 +143,15 @@ const TakePictures: FC<TakePicturesProps> = ({
     } else if (photos.length === 0 && photostrips.length !== 0) {
       setPhotostrips([]);
     }
-  }, [photos, history, photostrips, setPhotostrips, maxPhotos]);
+  }, [
+    photos,
+    history,
+    photostrips,
+    setPhotostrips,
+    maxPhotos,
+    ratio,
+    cloudSettings,
+  ]);
 
   let countText;
   if (count === startingCount) countText = 'Get Ready...';

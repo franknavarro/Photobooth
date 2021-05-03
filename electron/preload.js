@@ -41,6 +41,8 @@ contextBridge.exposeInMainWorld('printer', {
 
 contextBridge.exposeInMainWorld('cloud', {
   getBuckets: (settings) => ipcRenderer.invoke('get-buckets', settings),
+  uploadPhotos: (settings, files, ratio) =>
+    ipcRenderer.send('upload-photos', settings, files, ratio),
 });
 
 contextBridge.exposeInMainWorld('store', {
