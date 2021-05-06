@@ -34,8 +34,8 @@ const InterfaceSettings = forwardRef<HTMLDivElement, InterfaceSettingsProps>(
         <SelectInput
           label="Show Photo Preview"
           setId="interface.photoPreview"
-          value={settings.photoPreview}
-          items={[
+          defaultValue={settings.photoPreview}
+          defaultItems={[
             { value: 'none', label: 'None' },
             { value: 'top', label: 'Top' },
             { value: 'bottom', label: 'Bottom' },
@@ -47,7 +47,7 @@ const InterfaceSettings = forwardRef<HTMLDivElement, InterfaceSettingsProps>(
           setId="interface.initialCount"
           label="Initial Count Seconds"
           type="number"
-          value={settings.initialCount - 1}
+          defaultValue={(settings.initialCount - 1).toString()}
           validations={[blankError, floatError, getGreaterError(1)]}
           parser={parsePlus1}
         />
@@ -55,7 +55,7 @@ const InterfaceSettings = forwardRef<HTMLDivElement, InterfaceSettingsProps>(
           setId="interface.countTime"
           label="Standard Count Seconds"
           type="number"
-          value={settings.countTime - 1}
+          defaultValue={(settings.countTime - 1).toString()}
           validations={[blankError, floatError, getGreaterError(1)]}
           parser={parsePlus1}
         />
@@ -63,7 +63,7 @@ const InterfaceSettings = forwardRef<HTMLDivElement, InterfaceSettingsProps>(
           setId="interface.waitTime"
           label="Wait Seconds"
           type="number"
-          value={settings.waitTime}
+          defaultValue={settings.waitTime.toString()}
           validations={[blankError, floatError, getGreaterError(1)]}
           parser={Number}
         />

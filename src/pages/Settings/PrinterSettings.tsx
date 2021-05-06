@@ -16,7 +16,7 @@ const PrinterSettings = forwardRef<HTMLDivElement, PrinterSettingsProps>(
         <SelectInput
           label="Printer Name"
           setId="printer.printerName"
-          value={settings.printerName}
+          defaultValue={settings.printerName}
           dataFetch={async (setItems) => {
             const printers = await window.printer.list();
             if (!printers.length) {

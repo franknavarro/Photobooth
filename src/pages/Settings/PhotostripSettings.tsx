@@ -45,8 +45,8 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
         <SelectInput
           label="Photostrip Size (in)"
           setId="photostrip.stripSize"
-          value={settings.stripSize}
-          items={[
+          defaultValue={settings.stripSize}
+          defaultItems={[
             { value: sameStripSize({ height: 6, width: 2 }), label: '2 x 6' },
             { value: sameStripSize({ height: 6, width: 4 }), label: '4 x 6' },
           ]}
@@ -54,8 +54,8 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
         <SelectInput
           label="Image Size (in)"
           setId="photostrip.photoSize"
-          value={settings.photoSize}
-          items={[
+          defaultValue={settings.photoSize}
+          defaultItems={[
             { value: 'evenly', label: 'Split evenly' },
             { value: '3x2', label: '3 x 2' },
           ]}
@@ -70,7 +70,7 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
           setId="photostrip.maxPhotos"
           label="Max Photos"
           type="number"
-          value={settings.maxPhotos}
+          defaultValue={settings.maxPhotos.toString()}
           validations={[blankError, floatError, getBetweenError(1, 4)]}
           parser={Number}
         />
@@ -79,7 +79,7 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
             setId="photostrip.borders.horizontal"
             label="Horizontal Borders"
             type="number"
-            value={settings.borders.horizontal}
+            defaultValue={settings.borders.horizontal.toString()}
             validations={[negativeError, blankError, floatError]}
             parser={Number}
           />
@@ -87,7 +87,7 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
             setId="photostrip.borders.vertical"
             label="Vertical Borders"
             type="number"
-            value={settings.borders.vertical}
+            defaultValue={settings.borders.vertical.toString()}
             validations={[negativeError, blankError, floatError]}
             parser={Number}
           />
@@ -95,8 +95,8 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
         <SelectInput
           label="Logo Position"
           setId="photostrip.logoPosition"
-          value={settings.logoPosition}
-          items={[
+          defaultValue={settings.logoPosition}
+          defaultItems={[
             { value: 'none', label: 'None' },
             { value: 'top', label: 'Top' },
             { value: 'bottom', label: 'Bottom' },

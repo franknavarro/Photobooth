@@ -1,4 +1,4 @@
-type ValidationRule = (value: string) => boolean;
+type ValidationRule = (value: string) => Promise<boolean> | boolean;
 
 export interface Validation {
   rule: ValidationRule;
@@ -19,6 +19,22 @@ export const floatError: Validation = {
   rule: (value) => /\./.test(value),
   error: 'Must be a whole number.',
 };
+
+export const usernameError: Validation = {
+  rule: (value) => /[^A-Za-z_0-9]/.test(value),
+  error: 'Can only contain letters, numbers and "_".',
+};
+
+export const passwordCharacterMin: Validation = {
+  rule: (value) => value.length < 6,
+  error: 'Passwords must have at least 6 characters.',
+};
+
+export const passwordsMatchError = 'Passwords do not match.';
+export const passwordsMatch = (matcher: string): Validation => ({
+  rule: (value: string) => value !== matcher,
+  error: passwordsMatchError,
+});
 
 export const getGreaterError = (moreThan: number): Validation => {
   return {

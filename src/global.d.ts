@@ -2,7 +2,6 @@ type PhotostripList = import('./Router').PhotostripList;
 type PhotoboothStore = import('./store');
 
 type Store = import('electron-store')<PhotoboothStore>;
-type CloudSettings = import('@google-cloud/storage').StorageOptions;
 
 type PhotoSizes = {
   full: string;
@@ -14,6 +13,14 @@ type ImageRatio = {
   height: number;
 };
 
+type AsyncReturnType<T extends (...args: any) => any> = T extends (
+  ...args: any
+) => Promise<infer U>
+  ? U
+  : T extends (...args: any) => infer U
+  ? U
+  : any;
+
 interface Camera {
   initialize(): Promise<void>;
   deleteImg(file: string): Promise<void>;
@@ -22,10 +29,28 @@ interface Camera {
   takePhoto(index: number): Promise<PhotoSizes>;
 }
 
+type EventInfo = {
+  displayName: string;
+  uid: string;
+  eventId: string;
+};
+
 interface Window {
   camera: Camera;
   cloud: {
-    getBuckets: (settings: CloudSettings) => Promise<string[]>;
+    bucketExists: (certPath: string, bucketName: string) => Promise<boolean>;
+    createEvent: (
+      certPath: string,
+      id: string,
+      name: string,
+      password: string,
+    ) => Promise<EventInfo>;
+    deleteEvent: (
+      certPath: string,
+      uid: string,
+      eventId: string,
+    ) => Promise<void>;
+    getEvents: (certPath: string) => Promise<EventInfo[]>;
     uploadPhotos: (
       settings: PhotoboothStore['cloud'],
       files: PhotoSizes[],

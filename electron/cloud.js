@@ -1,7 +1,8 @@
 const { ipcMain } = require('electron');
-const { Storage } = require('@google-cloud/storage');
+const admin = require('firebase-admin');
 const path = require('path');
 const sharp = require('sharp');
+const uuid = require('uuid');
 
 const MAX_PICTURE_SIZE = 2000;
 const metadata = {
@@ -9,80 +10,182 @@ const metadata = {
   contentDisposition: 'attatchment',
 };
 
-ipcMain.handle('get-buckets', async (_, settings) => {
-  const storage = new Storage(settings);
-  const [buckets] = await storage.getBuckets();
-  return buckets.map((b) => b.name);
+const getUrl = (bucketName, filePath, token) =>
+  `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(
+    filePath,
+  )}?alt=media&token=${token}`;
+
+ipcMain.handle('bucket-exists', async (_, certPath, bucketName) => {
+  let app;
+  try {
+    app = admin.initializeApp(
+      {
+        credential: admin.credential.cert(certPath),
+        storageBucket: bucketName,
+      },
+      `bucket-checker-${uuid.v4()}`,
+    );
+    const bucket = app.storage().bucket();
+    const exists = await bucket.exists();
+    console.log({ exists, bucketName });
+    return exists[0];
+  } catch {
+    return false;
+  } finally {
+    if (app) await app.delete();
+  }
+});
+
+ipcMain.handle('create-event', async (_, certPath, id, name, password) => {
+  let app;
+  try {
+    app = admin.initializeApp(
+      { credential: admin.credential.cert(certPath) },
+      `event-creator-${uuid.v4()}`,
+    );
+    console.log({ id, password, name });
+    const newUser = await app.auth().createUser({
+      email: id + '@frankandmissy.com',
+      password,
+      displayName: name,
+    });
+    const event = app.firestore().collection('events').doc(id);
+    await event.set({ name });
+    return { eventId: id, displayName: name, uid: newUser.uid };
+  } catch (error) {
+    throw new Error(error);
+  } finally {
+    if (app) await app.delete();
+  }
+});
+
+ipcMain.handle('delete-event', async (_, certPath, uid, eventId) => {
+  let app;
+  try {
+    app = admin.initializeApp(
+      { credential: admin.credential.cert(certPath) },
+      `event-deleter-${uuid.v4()}`,
+    );
+    await app.auth().deleteUser(uid);
+    await app.firestore().collection('events').doc(eventId).delete();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    if (app) await app.delete();
+  }
+});
+
+ipcMain.handle('get-events', async (_, certPath) => {
+  let app;
+  try {
+    app = admin.initializeApp(
+      { credential: admin.credential.cert(certPath) },
+      `event-grabber-${uuid.v4()}`,
+    );
+    const users = await app.auth().listUsers();
+    const usersStripped = users.users.map(({ displayName, uid, email }) => ({
+      displayName,
+      uid,
+      eventId: email.split('@')[0],
+    }));
+    return usersStripped;
+  } catch (error) {
+    throw new Error(error.message);
+  } finally {
+    if (app) await app.delete();
+  }
 });
 
 ipcMain.on(
   'upload-photos',
-  async (
-    _,
-    { projectId, keyFilename, bucketName, bucketPath },
-    files,
-    ratio,
-  ) => {
+  async (_, { certPath, bucketName, eventId }, files, ratio) => {
     let errorKey;
-    if (!projectId) errorKey = 'Project ID';
-    else if (!keyFilename) errorKey = 'Key File';
+    if (!certPath) errorKey = 'Key File';
     else if (!bucketName) errorKey = 'Bucket Name';
+    else if (!eventId) errorKey = 'Event ID';
 
     try {
       if (errorKey) {
         throw new Error(`${errorKey} is not defined in cloud settings.`);
       }
+      let app;
+      try {
+        app = admin.initializeApp(
+          {
+            credential: admin.credential.cert(certPath),
+            storageBucket: bucketName,
+          },
+          `uploader-${uuid.v4()}`,
+        );
+        const bucket = app.storage().bucket();
+        await bucket.exists();
 
-      const heightCalc = {
-        width: MAX_PICTURE_SIZE,
-        height: (MAX_PICTURE_SIZE * ratio.height) / ratio.width,
-      };
-      const widthCalc = {
-        width: (MAX_PICTURE_SIZE * ratio.width) / ratio.height,
-        height: MAX_PICTURE_SIZE,
-      };
-      const imageResize =
-        widthCalc.width <= MAX_PICTURE_SIZE ? widthCalc : heightCalc;
+        const heightCalc = {
+          width: MAX_PICTURE_SIZE,
+          height: Math.round((MAX_PICTURE_SIZE * ratio.height) / ratio.width),
+        };
+        const widthCalc = {
+          width: Math.round((MAX_PICTURE_SIZE * ratio.width) / ratio.height),
+          height: MAX_PICTURE_SIZE,
+        };
+        const imageResize =
+          widthCalc.width <= MAX_PICTURE_SIZE ? widthCalc : heightCalc;
 
-      const webPrefix = '.web.jpg';
+        const webPrefix = '.web.jpg';
 
-      const startResize = process.hrtime();
-      const resized = files.map(({ full }) =>
-        sharp(full)
-          .resize(imageResize)
-          .toFile(full + webPrefix),
-      );
-      await Promise.all(resized);
-      const endResize = process.hrtime(startResize);
-      console.log(
-        `Resized images for web in ${endResize[0]}s ${
-          endResize[1] / 1000000
-        }ms`,
-      );
+        const resized = files.map(({ full }) =>
+          sharp(full)
+            .resize(imageResize)
+            .toFile(full + webPrefix),
+        );
+        await Promise.all(resized);
 
-      const startUpload = process.hrtime();
-      const bucket = new Storage({ projectId, keyFilename }).bucket(bucketName);
-      const webUpload = files.map(({ full, small }) =>
-        bucket.upload(full + webPrefix, {
-          destination: `${bucketPath}/full/${path.basename(small)}`,
-          metadata,
-        }),
-      );
-      const smallUpload = files.map(({ small }) =>
-        bucket.upload(small, {
-          destination: `${bucketPath}/thumbnail/${path.basename(small)}`,
-          metadata,
-        }),
-      );
-      await Promise.all([...webUpload, ...smallUpload]);
-      const endUpload = process.hrtime(startUpload);
-      console.log(
-        `Uploaded images to GCS in ${endUpload[0]}s ${
-          endUpload[1] / 1000000
-        }ms`,
-      );
+        const webUpload = files.map(async ({ full, small }) => {
+          const destination = `${eventId}/full/${path.basename(small)}`;
+          const token = uuid.v4();
+          const createdAt = parseInt(path.basename(small).split('.')[0]);
+          await bucket.upload(full + webPrefix, {
+            destination,
+            metadata: {
+              ...metadata,
+              metadata: { firebaseStorageDownloadTokens: token },
+            },
+          });
+          return { url: getUrl(bucket.name, destination, token), createdAt };
+        });
+        const smallUpload = files.map(async ({ small }) => {
+          const destination = `${eventId}/thumbnail/${path.basename(small)}`;
+          const token = uuid.v4();
+          const createdAt = parseInt(path.basename(small).split('.')[0]);
+          await bucket.upload(small, {
+            destination,
+            metadata: {
+              ...metadata,
+              metadata: { firebaseStorageDownloadTokens: token },
+            },
+          });
+          return { url: getUrl(bucket.name, destination, token), createdAt };
+        });
+        const webResults = await Promise.all(webUpload);
+        const smallResults = await Promise.all(smallUpload);
+
+        const eventPhotos = app.firestore().collection(eventId);
+        const databaseUpdates = webResults.map(async (webInfo, index) => {
+          const smallInfo = smallResults[index];
+          await eventPhotos.add({
+            thumbnail: smallInfo.url,
+            full: webInfo.url,
+            createdAt: admin.firestore.Timestamp.fromMillis(webInfo.createdAt),
+          });
+        });
+        await Promise.all(databaseUpdates);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (app) await app.delete();
+      }
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   },
 );

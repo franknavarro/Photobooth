@@ -6,19 +6,15 @@ const store = new Store({
       type: 'object',
       default: {},
       properties: {
-        projectId: {
-          type: 'string',
-          default: '',
-        },
-        keyFilename: {
-          type: 'string',
-          default: '',
-        },
         bucketName: {
           type: 'string',
           default: '',
         },
-        bucketPath: {
+        certPath: {
+          type: 'string',
+          default: '',
+        },
+        eventUID: {
           type: 'string',
           default: '',
         },

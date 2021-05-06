@@ -26,6 +26,7 @@ interface FileInputProps {
   value: string;
   accept?: string;
   onChange?: (file: string) => void;
+  error?: string;
 }
 
 const FileInput: FC<FileInputProps> = ({
@@ -34,6 +35,7 @@ const FileInput: FC<FileInputProps> = ({
   value,
   onChange,
   accept,
+  error,
 }) => {
   const classes = useStyles();
   const [file, setFile] = useState(value);
@@ -66,6 +68,8 @@ const FileInput: FC<FileInputProps> = ({
       <TextField
         className={classes.fileText}
         disabled
+        error={!!error}
+        helperText={!!error ? error : ''}
         id={`${htmlId}-text`}
         label={label}
         value={file || 'No file selected'}

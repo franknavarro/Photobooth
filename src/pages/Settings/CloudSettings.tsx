@@ -1,66 +1,82 @@
-import { useCallback, useMemo, useState, forwardRef } from 'react';
-import { debounce } from 'throttle-debounce';
+import { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import FileInput from '../../components/FileInput';
-import SelectInput, { ItemFetch } from '../../components/SelectInput';
+import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
 import Typography from '@material-ui/core/Typography';
+import { blankError } from '../../helpers/validations';
+import CreateEvent from './CreateEvent';
 
 interface CloudSettingsProps {
   settings: PhotoboothStore['cloud'];
   className?: string;
 }
 
+type Events = AsyncReturnType<Window['cloud']['getEvents']>;
+
 const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
   ({ settings, className }, ref) => {
-    const [projectId, setProjectId] = useState<string>(settings.projectId);
-    const [keyFilename, setKeyFile] = useState<string>(settings.keyFilename);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
+    const [certPath, setCertFile] = useState<string>(settings.certPath);
+    const [events, setEvents] = useState<Events>([]);
+    const [currentEvent, setCurrentEvent] = useState<string>(settings.eventUID);
+    const [loadingEvents, setLoadingEvents] = useState<boolean>(false);
+    const [eventsError, setEventsError] = useState<string>('');
 
-    const ddebouncedProjectId = useMemo(
-      () => debounce(500, false, (id: string) => setProjectId(id)),
-      [],
-    );
-
-    const getBucket = useCallback<ItemFetch>(
-      async (setItems) => {
+    useEffect(() => {
+      const getEvents = async () => {
         try {
-          setLoading(true);
-          setError('');
-          const buckets = await window.cloud.getBuckets({
-            projectId,
-            keyFilename,
-          });
-          setItems(buckets.map((b) => ({ label: b, value: b })));
+          setLoadingEvents(true);
+          setEventsError('');
+          const newEvents = await window.cloud.getEvents(certPath);
+          console.log(newEvents);
+          setEvents(newEvents);
         } catch (error) {
-          const message = error.message.split(':').splice(1).join();
-          setError(message);
-          throw new Error(message);
+          const message = error.message.split(':').splice(1).join(':');
+          setEventsError(message);
         } finally {
-          setLoading(false);
+          setLoadingEvents(false);
         }
-      },
-      [projectId, keyFilename],
-    );
+      };
+      if (certPath) getEvents();
+    }, [certPath]);
 
     const showExtraFields = () => {
-      if (projectId && keyFilename) {
+      if (loadingEvents) return <CircularProgress />;
+      else if (eventsError) return <></>;
+      else if (certPath) {
         return (
           <>
-            <SelectInput
-              label="Bucket Name"
+            <TextInput
+              defaultValue={settings.bucketName}
               setId="cloud.bucketName"
-              value={settings.bucketName}
-              dataFetch={getBucket}
+              validations={[
+                blankError,
+                {
+                  rule: async (value) =>
+                    !(await window.cloud.bucketExists(certPath, value)),
+                  error: 'Bucket does not exist',
+                },
+              ]}
             />
-            {!error && !loading && (
-              <TextInput
-                value={settings.bucketPath}
-                setId="cloud.bucketPath"
-                label="Save File to Path in Bucket"
-              />
-            )}
+            <SelectInput
+              showNone
+              label="Event"
+              setId="cloud.eventUID"
+              value={currentEvent}
+              onChange={(e) => setCurrentEvent(e as string)}
+              items={events.map((e) => ({
+                label: e.displayName || e.uid,
+                value: e.uid,
+              }))}
+            />
+            <CreateEvent
+              certPath={certPath}
+              setEvents={setEvents}
+              setCurrentEvent={setCurrentEvent}
+              events={events}
+              currentEvent={currentEvent}
+            />
           </>
         );
       }
@@ -68,19 +84,14 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
 
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Google Cloud Storage</Typography>
+        <Typography variant="h4">Firebase Settings</Typography>
         <FileInput
-          value={keyFilename}
-          setId="cloud.keyFilename"
+          value={certPath}
+          setId="cloud.certPath"
           label="Private Key File Path"
           accept="application/JSON"
-          onChange={(file) => setKeyFile(file)}
-        />
-        <TextInput
-          value={projectId}
-          setId="cloud.projectId"
-          label="Project ID"
-          onChange={(id) => ddebouncedProjectId(id)}
+          onChange={(file) => setCertFile(file)}
+          error={eventsError}
         />
         {showExtraFields()}
       </div>

@@ -24,29 +24,46 @@ export type ItemFetch = (
   setItems: Dispatch<SetStateAction<SelectItem[]>>,
 ) => void | Promise<void>;
 
-interface SelectInputProps extends SelectProps {
+interface SelectInputProps extends Omit<SelectProps, 'error'> {
   setId: string;
   label: string;
   items?: SelectItem[];
+  defaultItems?: SelectItem[];
   dataFetch?: ItemFetch;
+  loading?: boolean;
+  defaultValue?: unknown;
+  value?: string;
+  onChange?: (value: unknown) => void;
+  error?: string;
+  showNone?: boolean;
 }
 
 const SelectInput: FC<SelectInputProps> = ({
   setId,
-  items = [],
+  items,
+  defaultItems = [],
   label,
   className,
   value,
+  defaultValue,
+  loading,
+  onChange,
   dataFetch,
+  error,
+  showNone = false,
   ...props
 }) => {
   const classes = useStyles();
-  const [itemList, setItemList] = useState<SelectItem[]>(items);
-  const [controlledValue, setControlledValue] = useState<unknown>(value);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [controlledItems, setControlledItems] = useState<SelectItem[]>(
+    defaultItems,
+  );
+  const [controlledValue, setControlledValue] = useState<unknown>(
+    defaultValue || '',
+  );
+  const [dataLoading, setDataLoading] = useState<boolean>(false);
+  const [dataError, setDataError] = useState<string>('');
 
-  const valueInItems = itemList.findIndex(
+  const valueInItems = controlledItems.findIndex(
     (item) => item.value === controlledValue,
   );
   const htmlId = setId.replaceAll('.', '-');
@@ -54,39 +71,44 @@ const SelectInput: FC<SelectInputProps> = ({
   const handleChange: SelectProps['onChange'] = (event) => {
     const newValue = event.target.value;
     window.store.set(setId, newValue);
-    setControlledValue(newValue);
+    if (onChange) onChange(newValue);
+    else setControlledValue(newValue);
   };
 
   useEffect(() => {
     const getData = async () => {
       if (dataFetch) {
         try {
-          setLoading(true);
-          setError('');
-          await dataFetch(setItemList);
+          setDataLoading(true);
+          setDataError('');
+          await dataFetch(setControlledItems);
         } catch (error) {
-          setError(error.message);
+          setDataError(error.message);
         } finally {
-          setLoading(false);
+          setDataLoading(false);
         }
       }
     };
     getData();
   }, [dataFetch]);
 
-  if (loading) return <CircularProgress color="primary" />;
-  if (error) return <Typography>{error}</Typography>;
+  if (dataLoading || loading) return <CircularProgress color="primary" />;
+  if (error || dataError) return <Typography>{error || dataError}</Typography>;
+
+  const useValue =
+    value !== undefined ? value : valueInItems !== -1 ? controlledValue : '';
   return (
     <FormControl className={classes.input}>
       <InputLabel id={`${htmlId}-label`}>{label}</InputLabel>
       <Select
         labelId={`${htmlId}-label`}
         id={htmlId}
-        value={valueInItems !== -1 ? controlledValue : ''}
+        value={useValue}
         onChange={handleChange}
         {...props}
       >
-        {itemList.map(({ value, label, disabled }, index) => (
+        {showNone && <MenuItem value="">None</MenuItem>}
+        {(items || controlledItems).map(({ value, label, disabled }, index) => (
           <MenuItem
             value={value}
             key={index}

@@ -59,14 +59,16 @@ ipcMain.handle('initialize-strip', async (_, settings) => {
   const usingPhotos = maxPhotos + (logoPosition === 'none' ? 0 : 1);
   const photoBoxSize = {
     width: photostripSize.width - border.horizontal * 2,
-    height: photostripSize.height / usingPhotos - border.vertical * 1.5,
+    height: Math.round(
+      photostripSize.height / usingPhotos - border.vertical * 1.5,
+    ),
   };
 
   switch (photoSize) {
     case '3x2':
       imageResize = {
         width: photoBoxSize.width,
-        height: (photoBoxSize.width * 2) / 3,
+        height: Math.round((photoBoxSize.width * 2) / 3),
       };
       break;
     default:

@@ -1,9 +1,8 @@
 interface PhotostripStore {
   cloud: {
-    projectId: string;
-    keyFilename: string;
     bucketName: string;
-    bucketPath: string;
+    certPath: string;
+    eventUID: string;
   };
   photostrip: {
     borders: {
