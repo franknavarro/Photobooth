@@ -6,7 +6,7 @@ import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
 import Typography from '@material-ui/core/Typography';
 import { blankError } from '../../helpers/validations';
-import CreateEvent from './CreateEvent';
+import EditEvents from './EditEvents/EditEvents';
 
 interface CloudSettingsProps {
   settings: PhotoboothStore['cloud'];
@@ -21,6 +21,7 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
     const [events, setEvents] = useState<Events>([]);
     const [currentEvent, setCurrentEvent] = useState<string>(settings.eventUID);
     const [loadingEvents, setLoadingEvents] = useState<boolean>(false);
+    const [disableEvents, setDisableEvents] = useState<boolean>(false);
     const [eventsError, setEventsError] = useState<string>('');
 
     useEffect(() => {
@@ -65,17 +66,20 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
               setId="cloud.eventUID"
               value={currentEvent}
               onChange={(e) => setCurrentEvent(e as string)}
+              disabled={disableEvents}
               items={events.map((e) => ({
                 label: e.displayName || e.uid,
                 value: e.uid,
               }))}
             />
-            <CreateEvent
+            <EditEvents
               certPath={certPath}
-              setEvents={setEvents}
-              setCurrentEvent={setCurrentEvent}
               events={events}
+              setEvents={setEvents}
               currentEvent={currentEvent}
+              setCurrentEvent={setCurrentEvent}
+              disableEvents={disableEvents}
+              setDisableEvents={setDisableEvents}
             />
           </>
         );
