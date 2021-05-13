@@ -7,9 +7,12 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import TextInput from '../../../components/TextInput';
 import {
   blankError,
@@ -18,6 +21,17 @@ import {
   passwordsMatchError,
   usernameError,
 } from '../../../helpers/validations';
+
+export const useStyles = makeStyles((theme) => ({
+  alert: {
+    marginTop: theme.spacing(2),
+  },
+  input: {
+    margin: `${theme.spacing(2)}px 0px -${theme.spacing(2)}px -10px`,
+    display: 'flex',
+    width: '100%',
+  },
+}));
 
 type Events = AsyncReturnType<Window['cloud']['getEvents']>;
 
@@ -38,6 +52,10 @@ const CreateEvent: FC<CreateEventProps> = ({
   setEvents,
   setEventsButton,
 }) => {
+  const classes = useStyles();
+
+  const [autoId, setAutoId] = useState<boolean>(true);
+
   const [eventId, setEventId] = useState<string>('');
   const [eventIdError, setEventIdError] = useState<string>('');
 
@@ -56,6 +74,7 @@ const CreateEvent: FC<CreateEventProps> = ({
 
   useEffect(() => {
     if (!display) {
+      setAutoId(true);
       setEventId('');
       setEventIdError('');
       setEventName('');
@@ -72,6 +91,20 @@ const CreateEvent: FC<CreateEventProps> = ({
       }, 500);
     }
   }, [display]);
+
+  useEffect(() => {
+    if (autoId) {
+      setEventId(
+        eventName
+          .toLowerCase()
+          .replace(/&/g, 'and')
+          .replace(/[^a-z0-9_\s]/g, '')
+          .replace(/\s+/g, '_'),
+      );
+    }
+  }, [autoId, eventName]);
+
+  if (!display) return <></>;
 
   const createUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,20 +135,34 @@ const CreateEvent: FC<CreateEventProps> = ({
     }
   };
 
-  if (!display) return <></>;
-
   const isBlank = !eventId || !eventName || !eventPassword || !reenterPassword;
   const isError =
     !!eventIdError || !!eventNameError || !!passwordError || !!rePasswordError;
   return (
     <form onSubmit={createUser} ref={formRef}>
-      {!!formError && <Alert severity="error">{formError}</Alert>}
+      {!!formError && (
+        <Alert severity="error" className={classes.alert}>
+          {formError}
+        </Alert>
+      )}
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={autoId}
+            onChange={() => setAutoId((prev) => !prev)}
+            name="autoID"
+            color="primary"
+          />
+        }
+        className={classes.input}
+        label="Auto generate Event ID from Event Name"
+      />
       <TextInput
         value={eventId}
         label="Event ID"
-        disabled={loadingEvent}
+        disabled={loadingEvent || autoId}
         validations={[blankError, usernameError]}
-        onChange={setEventId}
+        onChange={(value) => setEventId(value.toLowerCase())}
         onError={setEventIdError}
         error={eventIdError}
       />
