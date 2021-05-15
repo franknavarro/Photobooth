@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CreateEvent from './CreateEvent';
+import EditEvent from './EditEvent';
 
 const useStyles = makeStyles((theme) => ({
   buttonSpacing: {
@@ -33,8 +34,9 @@ const EditEvents: FC<EditEventsProps> = ({
 }) => {
   const classes = useStyles();
   const [creatingEvent, setCreatingEvent] = useState<boolean>(false);
-  const [eventsButton, setEventsButton] = useState<boolean>(false);
   const [deletingEvent, setDeletingEvent] = useState<boolean>(false);
+  const [editingEvent, setEditingEvent] = useState<boolean>(false);
+  const [eventsButton, setEventsButton] = useState<boolean>(false);
 
   const deleteEvent = async () => {
     setDeletingEvent(true);
@@ -62,7 +64,6 @@ const EditEvents: FC<EditEventsProps> = ({
     }
   };
 
-  console.log({ creatingEvent, deletingEvent, eventsButton, disableEvents });
   return (
     <>
       <Button
@@ -72,16 +73,34 @@ const EditEvents: FC<EditEventsProps> = ({
           setDisableEvents((prev) => !prev);
           setCreatingEvent((prev) => !prev);
         }}
-        disabled={deletingEvent || eventsButton}
+        disabled={deletingEvent || editingEvent || eventsButton}
       >
         {creatingEvent ? 'Cancel Creating Event' : 'Create New Event'}
+      </Button>
+      <Button
+        className={classes.buttonSpacing}
+        color={editingEvent ? 'secondary' : 'default'}
+        variant="contained"
+        onClick={() => {
+          setDisableEvents((prev) => !prev);
+          setEditingEvent((prev) => !prev);
+        }}
+        disabled={
+          creatingEvent || deletingEvent || eventsButton || !currentEvent
+        }
+      >
+        {editingEvent ? 'Cancel Editing Event' : 'Edit Event'}
       </Button>
       <Button
         className={classes.buttonSpacing}
         color="secondary"
         variant="contained"
         disabled={
-          creatingEvent || deletingEvent || disableEvents || !currentEvent
+          creatingEvent ||
+          deletingEvent ||
+          editingEvent ||
+          disableEvents ||
+          !currentEvent
         }
         onClick={deleteEvent}
       >
@@ -95,6 +114,18 @@ const EditEvents: FC<EditEventsProps> = ({
           setDisableEvents(false);
         }}
         setCurrentEvent={setCurrentEvent}
+        setEvents={setEvents}
+        setEventsButton={setEventsButton}
+      />
+      <EditEvent
+        certPath={certPath}
+        display={editingEvent}
+        onEnd={() => {
+          setEditingEvent(false);
+          setDisableEvents(false);
+        }}
+        currentEvent={currentEvent}
+        events={events}
         setEvents={setEvents}
         setEventsButton={setEventsButton}
       />

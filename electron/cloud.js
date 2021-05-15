@@ -189,3 +189,37 @@ ipcMain.on(
     }
   },
 );
+
+ipcMain.handle('update-event', async (_, certPath, uid, fields) => {
+  let app;
+  try {
+    app = admin.initializeApp(
+      { credential: admin.credential.cert(certPath) },
+      `event-updater-${uuid.v4()}`,
+    );
+    const oldUserData = await app.auth().getUser(uid);
+
+    const filteredFields = {};
+    if (fields.id) filteredFields.email = fields.id + '@frankandmissy.com';
+    if (fields.name) filteredFields.displayName = fields.name;
+    if (fields.password) filteredFields.password = fields.password;
+    console.log(filteredFields);
+    const newUser = await app.auth().updateUser(uid, filteredFields);
+
+    const oldId = oldUserData.email.split('@')[0];
+    const newId = newUser.email.split('@')[0];
+    const events = app.firestore().collection('events');
+    if (oldId !== newId) await events.doc(oldId).delete();
+    await events.doc(newId).set({ name: newUser.displayName });
+
+    return {
+      eventId: newId,
+      displayName: newUser.displayName,
+      uid: newUser.uid,
+    };
+  } catch (error) {
+    throw new Error(error);
+  } finally {
+    if (app) await app.delete();
+  }
+});

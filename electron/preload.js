@@ -49,6 +49,8 @@ contextBridge.exposeInMainWorld('cloud', {
   getEvents: (certPath) => ipcRenderer.invoke('get-events', certPath),
   uploadPhotos: (settings, files, ratio) =>
     ipcRenderer.send('upload-photos', settings, files, ratio),
+  updateEvent: (certPath, uid, fields) =>
+    ipcRenderer.invoke('update-event', certPath, uid, fields),
 });
 
 contextBridge.exposeInMainWorld('store', {

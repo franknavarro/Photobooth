@@ -51,6 +51,11 @@ interface Window {
       eventId: string,
     ) => Promise<void>;
     getEvents: (certPath: string) => Promise<EventInfo[]>;
+    updateEvent: (
+      certPath: string,
+      uid: string,
+      fields: { id?: string; name?: string; password?: string },
+    ) => Promise<EventInfo>;
     uploadPhotos: (
       settings: PhotoboothStore['cloud'],
       files: PhotoSizes[],
