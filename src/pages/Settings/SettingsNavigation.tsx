@@ -1,8 +1,9 @@
 import { FC, RefObject } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Toolbar from '@material-ui/core/Toolbar';
 
@@ -18,13 +19,23 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerContainer: {
     overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   listItem: {
     padding: `0 ${theme.spacing(3)}px`,
+    width: 'auto',
   },
   list: {
+    margin: 0,
     padding: 0,
     paddingTop: theme.spacing(3),
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  listIcon: {
+    minWidth: 0,
   },
   listText: {
     margin: 0,
@@ -57,7 +68,7 @@ const SettingsNavigation: FC<SettingsNavigationProps> = ({ list }) => {
     >
       <Toolbar />
       <div className={classes.drawerContainer}>
-        <List className={classes.list}>
+        <div className={classes.list}>
           {list.map(({ name, ref }) => (
             <ListItem
               button
@@ -65,10 +76,14 @@ const SettingsNavigation: FC<SettingsNavigationProps> = ({ list }) => {
               className={classes.listItem}
               onClick={() => scrollToRef(ref)}
             >
+              <ListItemIcon className={classes.listIcon}>
+                {' '}
+                <ChevronRightIcon />{' '}
+              </ListItemIcon>
               <ListItemText primary={name} className={classes.listText} />
             </ListItem>
           ))}
-        </List>
+        </div>
       </div>
     </Drawer>
   );

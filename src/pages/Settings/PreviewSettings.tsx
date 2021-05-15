@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Header from '../../components/Header';
 import LivePreview from '../../components/LivePreview';
 import Typography from '@material-ui/core/Typography';
 
@@ -23,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: theme.spacing(2),
     },
     flex: 1,
-    marginBottom: theme.spacing(3),
+  },
+  topSpacing: {
+    marginTop: theme.spacing(3),
   },
   previewImage: {
     height: '100%',
@@ -116,7 +119,7 @@ const PreviewSettings = forwardRef<HTMLDivElement, PreviewSettingsProps>(
 
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Preview</Typography>
+        <Header>Preview</Header>
         <div className={classes.cameraPreview}>
           <div className={classes.buttons}>
             <Button
@@ -138,7 +141,12 @@ const PreviewSettings = forwardRef<HTMLDivElement, PreviewSettingsProps>(
               Generate Sample Strip
             </Button>
           </div>
-          <div className={classes.previewBox} ref={previewRef}>
+          <div
+            className={clsx(classes.previewBox, {
+              [classes.topSpacing]: loading || error || run || sampleStrip,
+            })}
+            ref={previewRef}
+          >
             {getPreview()}
           </div>
         </div>

@@ -7,10 +7,10 @@ import {
   getBetweenError,
 } from '../../helpers/validations';
 import clsx from 'clsx';
+import Header from '../../components/Header';
 import FileInput from '../../components/FileInput';
 import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
-import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme) => ({
   group: {
@@ -41,7 +41,7 @@ const PhotostripSettings = forwardRef<HTMLDivElement, PhotostripSettingsProps>(
 
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Photostrip</Typography>
+        <Header top>Photostrip</Header>
         <SelectInput
           label="Photostrip Size (in)"
           setId="photostrip.stripSize"

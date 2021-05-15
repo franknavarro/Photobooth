@@ -6,9 +6,9 @@ import {
 } from '../../helpers/validations';
 import clsx from 'clsx';
 import ColorInput from '../../components/ColorInput';
+import Header from '../../components/Header';
 import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
-import Typography from '@material-ui/core/Typography';
 
 interface InterfaceSettingsProps {
   settings: PhotoboothStore['interface'];
@@ -20,7 +20,7 @@ const InterfaceSettings = forwardRef<HTMLDivElement, InterfaceSettingsProps>(
     const parsePlus1 = (v: string) => parseInt(v) + 1;
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Interface</Typography>
+        <Header>Interface</Header>
         <ColorInput
           setId="interface.primaryColor"
           label="Primary Color"

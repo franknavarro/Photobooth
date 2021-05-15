@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import clsx from 'clsx';
+import Header from '../../components/Header';
 import SelectInput from '../../components/SelectInput';
-import Typography from '@material-ui/core/Typography';
 
 interface PrinterSettingsProps {
   settings: PhotoboothStore['printer'];
@@ -12,7 +12,7 @@ const PrinterSettings = forwardRef<HTMLDivElement, PrinterSettingsProps>(
   ({ settings, className }, ref) => {
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Printer</Typography>
+        <Header>Printer</Header>
         <SelectInput
           label="Printer Name"
           setId="printer.printerName"

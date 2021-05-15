@@ -2,20 +2,20 @@ import { useEffect, useState, forwardRef } from 'react';
 import clsx from 'clsx';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FileInput from '../../components/FileInput';
+import Header from '../../components/Header';
 import SelectInput from '../../components/SelectInput';
 import TextInput from '../../components/TextInput';
-import Typography from '@material-ui/core/Typography';
 import { blankError } from '../../helpers/validations';
 import EditEvents from './EditEvents/EditEvents';
 
-interface CloudSettingsProps {
+interface EventSettingsProps {
   settings: PhotoboothStore['cloud'];
   className?: string;
 }
 
 type Events = AsyncReturnType<Window['cloud']['getEvents']>;
 
-const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
+const EventSettings = forwardRef<HTMLDivElement, EventSettingsProps>(
   ({ settings, className }, ref) => {
     const [certPath, setCertFile] = useState<string>(settings.certPath);
     const [events, setEvents] = useState<Events>([]);
@@ -49,6 +49,7 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
         return (
           <>
             <TextInput
+              label="Firebase Bucket Name"
               defaultValue={settings.bucketName}
               setId="cloud.bucketName"
               validations={[
@@ -88,11 +89,11 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
 
     return (
       <div ref={ref} className={clsx(className)}>
-        <Typography variant="h4">Firebase Settings</Typography>
+        <Header>Event</Header>
         <FileInput
           value={certPath}
           setId="cloud.certPath"
-          label="Private Key File Path"
+          label="Firebase Private Key File Path"
           accept="application/JSON"
           onChange={(file) => setCertFile(file)}
           error={eventsError}
@@ -103,4 +104,4 @@ const CloudSettings = forwardRef<HTMLDivElement, CloudSettingsProps>(
   },
 );
 
-export default CloudSettings;
+export default EventSettings;

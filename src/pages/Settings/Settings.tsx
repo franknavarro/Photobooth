@@ -2,7 +2,7 @@ import { FC, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import PreviewSettings from './PreviewSettings';
-import CloudSettings from './CloudSettings';
+import EventSettings from './EventSettings';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InterfaceSettings from './InterfaceSettings';
 import Paper from '@material-ui/core/Paper';
@@ -38,7 +38,7 @@ const Settings: FC = () => {
   const interfaceRef = useRef<HTMLDivElement>(null);
   const printerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const cloudRef = useRef<HTMLDivElement>(null);
+  const eventRef = useRef<HTMLDivElement>(null);
 
   return (
     <ThemeProvider theme={settingsTheme}>
@@ -48,10 +48,10 @@ const Settings: FC = () => {
         <SettingsNavigation
           list={[
             { name: 'Photostrip', ref: photostripRef },
-            { name: 'Interface', ref: interfaceRef },
-            { name: 'Printer', ref: printerRef },
             { name: 'Preview', ref: previewRef },
-            { name: 'Cloud Backup', ref: cloudRef },
+            { name: 'Printer', ref: printerRef },
+            { name: 'Event', ref: eventRef },
+            { name: 'Interface', ref: interfaceRef },
           ]}
         />
         <main className={classes.main}>
@@ -60,9 +60,8 @@ const Settings: FC = () => {
             settings={store.photostrip}
             className={classes.settingsSection}
           />
-          <InterfaceSettings
-            ref={interfaceRef}
-            settings={store.interface}
+          <PreviewSettings
+            ref={previewRef}
             className={classes.settingsSection}
           />
           <PrinterSettings
@@ -70,13 +69,14 @@ const Settings: FC = () => {
             settings={store.printer}
             className={classes.settingsSection}
           />
-          <PreviewSettings
-            ref={previewRef}
+          <EventSettings
+            ref={eventRef}
+            settings={store.cloud}
             className={classes.settingsSection}
           />
-          <CloudSettings
-            ref={cloudRef}
-            settings={store.cloud}
+          <InterfaceSettings
+            ref={interfaceRef}
+            settings={store.interface}
             className={classes.settingsSection}
           />
         </main>
