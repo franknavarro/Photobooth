@@ -14,6 +14,7 @@ const PrinterSettings = forwardRef<HTMLDivElement, PrinterSettingsProps>(
       <div ref={ref} className={clsx(className)}>
         <Header>Printer</Header>
         <SelectInput
+          showNone
           label="Printer Name"
           setId="printer.printerName"
           defaultValue={settings.printerName}

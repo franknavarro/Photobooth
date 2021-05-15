@@ -98,11 +98,11 @@ ipcMain.handle('get-events', async (_, certPath) => {
 
 ipcMain.on(
   'upload-photos',
-  async (_, { certPath, bucketName, eventId }, files, ratio) => {
+  async (_, { certPath, bucketName, eventUID }, files, ratio) => {
     let errorKey;
     if (!certPath) errorKey = 'Key File';
     else if (!bucketName) errorKey = 'Bucket Name';
-    else if (!eventId) errorKey = 'Event ID';
+    else if (!eventUID) errorKey = 'Event ID';
 
     try {
       if (errorKey) {
@@ -141,7 +141,7 @@ ipcMain.on(
         await Promise.all(resized);
 
         const webUpload = files.map(async ({ full, small }) => {
-          const destination = `${eventId}/full/${path.basename(small)}`;
+          const destination = `${eventUID}/full/${path.basename(small)}`;
           const token = uuid.v4();
           const createdAt = parseInt(path.basename(small).split('.')[0]);
           await bucket.upload(full + webPrefix, {
@@ -154,7 +154,7 @@ ipcMain.on(
           return { url: getUrl(bucket.name, destination, token), createdAt };
         });
         const smallUpload = files.map(async ({ small }) => {
-          const destination = `${eventId}/thumbnail/${path.basename(small)}`;
+          const destination = `${eventUID}/thumbnail/${path.basename(small)}`;
           const token = uuid.v4();
           const createdAt = parseInt(path.basename(small).split('.')[0]);
           await bucket.upload(small, {
@@ -169,7 +169,7 @@ ipcMain.on(
         const webResults = await Promise.all(webUpload);
         const smallResults = await Promise.all(smallUpload);
 
-        const eventPhotos = app.firestore().collection(eventId);
+        const eventPhotos = app.firestore().collection(eventUID);
         const databaseUpdates = webResults.map(async (webInfo, index) => {
           const smallInfo = smallResults[index];
           await eventPhotos.add({
