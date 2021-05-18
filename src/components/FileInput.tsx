@@ -1,7 +1,9 @@
 import { FC, useState, ChangeEvent } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import ClearIcon from '@material-ui/icons/Clear';
 import FormControl from '@material-ui/core/FormControl';
+import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 
 interface FileType extends File {
@@ -9,6 +11,10 @@ interface FileType extends File {
 }
 
 const useStyles = makeStyles((theme) => ({
+  clear: {
+    padding: 0,
+    margin: `${theme.spacing(2)}px ${theme.spacing()}px 0 ${theme.spacing()}px`,
+  },
   fileSelector: {
     margin: `${theme.spacing(2)}px 0`,
     display: 'flex',
@@ -43,14 +49,19 @@ const FileInput: FC<FileInputProps> = ({
   const [file, setFile] = useState(value);
   const htmlId = setId.replaceAll('.', '-');
 
+  const setChange = (value: string) => {
+    window.store.set(setId, value);
+    setFile(value);
+    if (onChange) onChange(value);
+  };
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
     if (newFiles && newFiles.length) {
       const newFile = (newFiles[0] as FileType).path;
-      window.store.set(setId, newFile);
-      setFile(newFile);
-      if (onChange) onChange(newFile);
+      setChange(newFile);
     }
+    event.target.value = '';
   };
 
   return (
@@ -81,6 +92,16 @@ const FileInput: FC<FileInputProps> = ({
         label={label}
         value={file || 'No file selected'}
       />
+      {file && (
+        <IconButton
+          aria-label="clear"
+          className={classes.clear}
+          disabled={disabled}
+          onClick={() => setChange('')}
+        >
+          <ClearIcon />
+        </IconButton>
+      )}
     </div>
   );
 };
