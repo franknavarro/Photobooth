@@ -16,7 +16,7 @@ function createWindow() {
 
   // and load the app.
   if (isDev) mainWindow.loadURL('http://localhost:3000');
-  else mainWindow.loadFile('../build/index.html');
+  else mainWindow.loadFile('./build/index.html');
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
