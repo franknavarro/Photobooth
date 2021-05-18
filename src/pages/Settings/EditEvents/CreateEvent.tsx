@@ -8,10 +8,10 @@ import {
   SetStateAction,
 } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import EventError from '../../../components/EventError';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import TextInput from '../../../components/TextInput';
 import {
@@ -23,9 +23,6 @@ import {
 } from '../../../helpers/validations';
 
 export const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(2),
-  },
   input: {
     margin: `${theme.spacing(2)}px 0px -${theme.spacing(2)}px -10px`,
     display: 'flex',
@@ -34,9 +31,10 @@ export const useStyles = makeStyles((theme) => ({
 }));
 
 type Events = AsyncReturnType<Window['cloud']['getEvents']>;
+type Settings = Parameters<Window['cloud']['createEvent']>[0];
 
 interface CreateEventProps {
-  certPath: string;
+  settings: Settings;
   display: boolean;
   onEnd: () => void;
   setCurrentEvent: Dispatch<SetStateAction<string>>;
@@ -45,7 +43,7 @@ interface CreateEventProps {
 }
 
 const CreateEvent: FC<CreateEventProps> = ({
-  certPath,
+  settings,
   display,
   onEnd,
   setCurrentEvent,
@@ -113,7 +111,7 @@ const CreateEvent: FC<CreateEventProps> = ({
       setLoadingEvent(true);
       setFormError('');
       const newEvent = await window.cloud.createEvent(
-        certPath,
+        settings,
         eventId,
         eventName,
         eventPassword,
@@ -140,11 +138,7 @@ const CreateEvent: FC<CreateEventProps> = ({
     !!eventIdError || !!eventNameError || !!passwordError || !!rePasswordError;
   return (
     <form onSubmit={createUser} ref={formRef}>
-      {!!formError && (
-        <Alert severity="error" className={classes.alert}>
-          {formError}
-        </Alert>
-      )}
+      <EventError message={formError} />
       <FormControlLabel
         control={
           <Checkbox

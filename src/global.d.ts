@@ -40,7 +40,7 @@ interface Window {
   cloud: {
     bucketExists: (certPath: string, bucketName: string) => Promise<boolean>;
     createEvent: (
-      certPath: string,
+      settings: Pick<PhotoboothStore['cloud'], 'certPath' | 'domain'>,
       id: string,
       name: string,
       password: string,
@@ -52,7 +52,7 @@ interface Window {
     ) => Promise<void>;
     getEvents: (certPath: string) => Promise<EventInfo[]>;
     updateEvent: (
-      certPath: string,
+      settings: Pick<PhotoboothStore['cloud'], 'certPath' | 'domain'>,
       uid: string,
       fields: { id?: string; name?: string; password?: string },
     ) => Promise<EventInfo>;

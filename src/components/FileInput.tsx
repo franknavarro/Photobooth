@@ -27,6 +27,7 @@ interface FileInputProps {
   accept?: string;
   onChange?: (file: string) => void;
   error?: string;
+  disabled?: boolean;
 }
 
 const FileInput: FC<FileInputProps> = ({
@@ -36,6 +37,7 @@ const FileInput: FC<FileInputProps> = ({
   onChange,
   accept,
   error,
+  disabled = false,
 }) => {
   const classes = useStyles();
   const [file, setFile] = useState(value);
@@ -54,7 +56,12 @@ const FileInput: FC<FileInputProps> = ({
   return (
     <div className={classes.fileSelector}>
       <FormControl>
-        <Button variant="contained" color="primary" component="label">
+        <Button
+          variant="contained"
+          color="primary"
+          component="label"
+          disabled={disabled}
+        >
           Choose File
           <input
             hidden

@@ -14,6 +14,10 @@ const store = new Store({
           type: 'string',
           default: '',
         },
+        domain: {
+          type: 'string',
+          default: 'example.com',
+        },
         eventUID: {
           type: 'string',
           default: '',

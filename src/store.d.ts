@@ -2,6 +2,7 @@ interface PhotostripStore {
   cloud: {
     bucketName: string;
     certPath: string;
+    domain: string;
     eventUID: string;
   };
   photostrip: {

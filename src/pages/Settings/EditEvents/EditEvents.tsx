@@ -15,6 +15,7 @@ type Events = AsyncReturnType<Window['cloud']['getEvents']>;
 
 interface EditEventsProps {
   certPath: string;
+  domain: string;
   events: Events;
   setEvents: Dispatch<SetStateAction<Events>>;
   currentEvent: string;
@@ -25,6 +26,7 @@ interface EditEventsProps {
 
 const EditEvents: FC<EditEventsProps> = ({
   certPath,
+  domain,
   events,
   setEvents,
   currentEvent,
@@ -107,7 +109,7 @@ const EditEvents: FC<EditEventsProps> = ({
         {deletingEvent ? <CircularProgress /> : 'Delete Current Event'}
       </Button>
       <CreateEvent
-        certPath={certPath}
+        settings={{ certPath, domain }}
         display={creatingEvent}
         onEnd={() => {
           setCreatingEvent(false);
@@ -118,7 +120,7 @@ const EditEvents: FC<EditEventsProps> = ({
         setEventsButton={setEventsButton}
       />
       <EditEvent
-        certPath={certPath}
+        settings={{ certPath, domain }}
         display={editingEvent}
         onEnd={() => {
           setEditingEvent(false);

@@ -42,15 +42,15 @@ contextBridge.exposeInMainWorld('printer', {
 contextBridge.exposeInMainWorld('cloud', {
   bucketExists: (certPath, bucketName) =>
     ipcRenderer.invoke('bucket-exists', certPath, bucketName),
-  createEvent: (certPath, id, name, password) =>
-    ipcRenderer.invoke('create-event', certPath, id, name, password),
+  createEvent: (settings, id, name, password) =>
+    ipcRenderer.invoke('create-event', settings, id, name, password),
   deleteEvent: (certPath, uid, eventId) =>
     ipcRenderer.invoke('delete-event', certPath, uid, eventId),
   getEvents: (certPath) => ipcRenderer.invoke('get-events', certPath),
   uploadPhotos: (settings, files, ratio) =>
     ipcRenderer.send('upload-photos', settings, files, ratio),
-  updateEvent: (certPath, uid, fields) =>
-    ipcRenderer.invoke('update-event', certPath, uid, fields),
+  updateEvent: (settings, uid, fields) =>
+    ipcRenderer.invoke('update-event', settings, uid, fields),
 });
 
 contextBridge.exposeInMainWorld('store', {

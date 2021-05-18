@@ -15,6 +15,11 @@ export const blankError: Validation = {
   error: 'Cannot be blank.',
 };
 
+export const domainError: Validation = {
+  rule: (value) => !/^([a-z0-9]+(-[a-z0-9]+)*)+\.[a-z]{2,}$/.test(value),
+  error: "Must be a valid domain. (ie: 'example.com')",
+};
+
 export const floatError: Validation = {
   rule: (value) => /\./.test(value),
   error: 'Must be a whole number.',

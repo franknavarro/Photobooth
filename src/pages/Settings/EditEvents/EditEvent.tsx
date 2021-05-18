@@ -8,10 +8,10 @@ import {
   SetStateAction,
 } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import EventError from '../../../components/EventError';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import TextInput from '../../../components/TextInput';
 import {
@@ -23,9 +23,6 @@ import {
 } from '../../../helpers/validations';
 
 export const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(2),
-  },
   input: {
     margin: `${theme.spacing(2)}px 0px -${theme.spacing(2)}px -10px`,
     display: 'flex',
@@ -34,9 +31,10 @@ export const useStyles = makeStyles((theme) => ({
 }));
 
 type Events = AsyncReturnType<Window['cloud']['getEvents']>;
+type Settings = Parameters<Window['cloud']['createEvent']>[0];
 
 interface EditEventProps {
-  certPath: string;
+  settings: Settings;
   display: boolean;
   onEnd: () => void;
   currentEvent: string;
@@ -46,7 +44,7 @@ interface EditEventProps {
 }
 
 const EditEvent: FC<EditEventProps> = ({
-  certPath,
+  settings,
   display,
   onEnd,
   currentEvent,
@@ -120,7 +118,7 @@ const EditEvent: FC<EditEventProps> = ({
       setLoadingEvent(true);
       setFormError('');
       const editedEvent = await window.cloud.updateEvent(
-        certPath,
+        settings,
         currentEvent,
         { id: eventId, name: eventName, password: eventPassword },
       );
@@ -151,11 +149,7 @@ const EditEvent: FC<EditEventProps> = ({
 
   return (
     <form onSubmit={editUser} ref={formRef}>
-      {!!formError && (
-        <Alert severity="error" className={classes.alert}>
-          {formError}
-        </Alert>
-      )}
+      <EventError message={formError} />
       <FormControlLabel
         control={
           <Checkbox

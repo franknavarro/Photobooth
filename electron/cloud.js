@@ -36,16 +36,16 @@ ipcMain.handle('bucket-exists', async (_, certPath, bucketName) => {
   }
 });
 
-ipcMain.handle('create-event', async (_, certPath, id, name, password) => {
+ipcMain.handle('create-event', async (_, settings, id, name, password) => {
   let app;
   try {
     app = admin.initializeApp(
-      { credential: admin.credential.cert(certPath) },
+      { credential: admin.credential.cert(settings.certPath) },
       `event-creator-${uuid.v4()}`,
     );
     console.log({ id, password, name });
     const newUser = await app.auth().createUser({
-      email: id + '@frankandmissy.com',
+      email: id + '@' + settings.domain,
       password,
       displayName: name,
     });
@@ -190,17 +190,17 @@ ipcMain.on(
   },
 );
 
-ipcMain.handle('update-event', async (_, certPath, uid, fields) => {
+ipcMain.handle('update-event', async (_, settings, uid, fields) => {
   let app;
   try {
     app = admin.initializeApp(
-      { credential: admin.credential.cert(certPath) },
+      { credential: admin.credential.cert(settings.certPath) },
       `event-updater-${uuid.v4()}`,
     );
     const oldUserData = await app.auth().getUser(uid);
 
     const filteredFields = {};
-    if (fields.id) filteredFields.email = fields.id + '@frankandmissy.com';
+    if (fields.id) filteredFields.email = fields.id + '@' + settings.domain;
     if (fields.name) filteredFields.displayName = fields.name;
     if (fields.password) filteredFields.password = fields.password;
     console.log(filteredFields);

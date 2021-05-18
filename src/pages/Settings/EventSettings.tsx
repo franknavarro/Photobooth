@@ -1,4 +1,4 @@
-import { blankError } from '../../helpers/validations';
+import { blankError, domainError } from '../../helpers/validations';
 import { useEffect, useState, forwardRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
@@ -62,6 +62,8 @@ const EventSettings = forwardRef<HTMLDivElement, EventSettingsProps>(
     const classes = useStyles();
 
     const [certPath, setCertFile] = useState<string>(settings.certPath);
+    const [domain, setDomain] = useState<string>(settings.domain);
+    const [domainFlaw, setDomainFlaw] = useState<string>('');
     const [events, setEvents] = useState<Events>([]);
     const [currentEvent, setCurrentEvent] = useState<string>(settings.eventUID);
     const [loadingEvents, setLoadingEvents] = useState<boolean>(false);
@@ -89,7 +91,7 @@ const EventSettings = forwardRef<HTMLDivElement, EventSettingsProps>(
     const showExtraFields = () => {
       if (loadingEvents) return <CircularProgress />;
       else if (eventsError) return <></>;
-      else if (certPath) {
+      else if (!!certPath && !!domain && !domainFlaw) {
         return (
           <>
             <SelectInput
@@ -106,6 +108,7 @@ const EventSettings = forwardRef<HTMLDivElement, EventSettingsProps>(
             />
             <EditEvents
               certPath={certPath}
+              domain={domain}
               events={events}
               setEvents={setEvents}
               currentEvent={currentEvent}
@@ -142,21 +145,34 @@ const EventSettings = forwardRef<HTMLDivElement, EventSettingsProps>(
               accept="application/JSON"
               onChange={(file) => setCertFile(file)}
               error={eventsError}
+              disabled={disableEvents}
             />
             {certPath && (
-              <TextInput
-                label="Firebase Bucket Name"
-                defaultValue={settings.bucketName}
-                setId="cloud.bucketName"
-                validations={[
-                  blankError,
-                  {
-                    rule: async (value) =>
-                      !(await window.cloud.bucketExists(certPath, value)),
-                    error: 'Bucket does not exist',
-                  },
-                ]}
-              />
+              <>
+                <TextInput
+                  label="Firebase Bucket Name"
+                  defaultValue={settings.bucketName}
+                  setId="cloud.bucketName"
+                  validations={[
+                    blankError,
+                    {
+                      rule: async (value) =>
+                        !(await window.cloud.bucketExists(certPath, value)),
+                      error: 'Bucket does not exist',
+                    },
+                  ]}
+                />
+                <TextInput
+                  label="Firebase Email Domain"
+                  value={domain}
+                  setId="cloud.domain"
+                  onChange={setDomain}
+                  error={domainFlaw}
+                  onError={setDomainFlaw}
+                  validations={[blankError, domainError]}
+                  disabled={disableEvents}
+                />
+              </>
             )}
           </AccordionDetails>
         </Accordion>
