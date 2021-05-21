@@ -66,7 +66,10 @@ interface Window {
     initialize: (
       settings: PhotoboothStore['photostrip'],
     ) => Promise<ImageRatio>;
-    createStrips: () => Promise<PhotostripList>;
+    createStrips: (
+      adjustLeftCut: number,
+      adjustRightCut: number,
+    ) => Promise<PhotostripList>;
     sampleStrip: (image: string) => Promise<string>;
   };
   printer: {

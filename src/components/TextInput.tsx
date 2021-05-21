@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 interface TextInputProps
   extends Omit<
     FilledTextFieldProps,
-    'variant' | 'id' | 'error' | 'onChange' | 'onError'
+    'variant' | 'id' | 'error' | 'onChange' | 'onError' | 'helperText'
   > {
   setId?: string;
   validations?: Validation[];
@@ -25,6 +25,7 @@ interface TextInputProps
   onChange?: (text: string) => void;
   onError?: (text: string, value: string) => void;
   error?: string;
+  helperText?: string;
 }
 
 const TextInput: FC<TextInputProps> = ({
@@ -36,6 +37,7 @@ const TextInput: FC<TextInputProps> = ({
   onError,
   error,
   defaultValue,
+  helperText,
   ...props
 }) => {
   const classes = useStyles();
@@ -77,13 +79,14 @@ const TextInput: FC<TextInputProps> = ({
     validateFields(newValue);
   };
 
+  const showError = error !== undefined ? error : controlledError;
   return (
     <TextField
       variant="filled"
-      error={error !== undefined ? !!error : !!controlledError}
+      error={!!showError}
       value={value !== undefined ? value : controlledValue}
       onChange={handleChange}
-      helperText={error !== undefined ? error : controlledError}
+      helperText={!!showError ? showError : helperText}
       className={classes.input}
       {...props}
     />

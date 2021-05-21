@@ -106,12 +106,13 @@ ipcMain.handle('add-image', async (_, image, position) => {
   }
 });
 
-ipcMain.handle('create-strips', async () => {
+ipcMain.handle('create-strips', async (_, adjustLeftCut, adjustRightCut) => {
   try {
+    console.log({ adjustLeftCut, adjustRightCut });
     const greyscale = await sharp(photostrip).greyscale().toBuffer();
     const baseImg = sharp({
       create: {
-        width: photostripSize.width * 2,
+        width: photostripSize.width * 2 + adjustLeftCut + adjustRightCut,
         height: photostripSize.height,
         ...WHITE_BOX,
       },
@@ -139,8 +140,12 @@ ipcMain.handle('create-strips', async () => {
     const stripsPromise = stripsList.map(async ({ left, right, path }) => {
       return await baseImg
         .composite([
-          { input: left, top: 0, left: 0 },
-          { input: right, top: 0, left: photostripSize.width },
+          { input: left, top: 0, left: adjustLeftCut },
+          {
+            input: right,
+            top: 0,
+            left: photostripSize.width + adjustLeftCut,
+          },
         ])
         .withMetadata()
         .toFile(path);

@@ -29,6 +29,8 @@ interface PhotostripStore {
   };
   printer: {
     printerName: string;
+    adjustLeftCut: number;
+    adjustRightCut: number;
   };
 }
 

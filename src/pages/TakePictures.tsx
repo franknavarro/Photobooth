@@ -70,6 +70,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface TakePicturesProps {
+  adjustLeftCut: PhotoboothStore['printer']['adjustLeftCut'];
+  adjustRightCut: PhotoboothStore['printer']['adjustRightCut'];
   cloudSettings: PhotoboothStore['cloud'];
   countTime: PhotoboothStore['interface']['countTime'];
   initialCount: PhotoboothStore['interface']['initialCount'];
@@ -83,6 +85,8 @@ interface TakePicturesProps {
 }
 
 const TakePictures: FC<TakePicturesProps> = ({
+  adjustLeftCut,
+  adjustRightCut,
   cloudSettings,
   countTime,
   initialCount,
@@ -135,7 +139,11 @@ const TakePictures: FC<TakePicturesProps> = ({
   // Generate Photostrips
   useEffect(() => {
     const createStrips = async () => {
-      const stripData = await window.photostrip.createStrips();
+      console.log({ adjustLeftCut, adjustRightCut });
+      const stripData = await window.photostrip.createStrips(
+        adjustLeftCut,
+        adjustRightCut,
+      );
       setPhotostrips([...stripData]);
       window.cloud.uploadPhotos(cloudSettings, photos, ratio);
       if (printerName) history.push('/selection');
@@ -147,6 +155,8 @@ const TakePictures: FC<TakePicturesProps> = ({
       setPhotostrips([]);
     }
   }, [
+    adjustLeftCut,
+    adjustRightCut,
     cloudSettings,
     history,
     maxPhotos,

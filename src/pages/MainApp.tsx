@@ -45,6 +45,8 @@ const MainApp: FC<MainAppProps> = ({ store, ratio }) => {
       </Route>
       <Route path="/takePictures">
         <TakePictures
+          adjustLeftCut={store.printer.adjustLeftCut}
+          adjustRightCut={store.printer.adjustRightCut}
           cloudSettings={store.cloud}
           countTime={store.interface.countTime}
           initialCount={store.interface.initialCount}

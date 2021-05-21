@@ -29,7 +29,8 @@ contextBridge.exposeInMainWorld('photostrip', {
   initialize: async (settings) => {
     return await ipcRenderer.invoke('initialize-strip', settings);
   },
-  createStrips: () => ipcRenderer.invoke('create-strips'),
+  createStrips: (adjustLeftCut, adjustRightCut) =>
+    ipcRenderer.invoke('create-strips', adjustLeftCut, adjustRightCut),
   sampleStrip: (photo) => ipcRenderer.invoke('sample-strip', photo),
 });
 

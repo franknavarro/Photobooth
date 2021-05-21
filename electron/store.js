@@ -123,6 +123,14 @@ const store = new Store({
           type: 'string',
           default: '',
         },
+        adjustLeftCut: {
+          type: 'number',
+          default: 0,
+        },
+        adjustRightCut: {
+          type: 'number',
+          default: 0,
+        },
       },
     },
   },
