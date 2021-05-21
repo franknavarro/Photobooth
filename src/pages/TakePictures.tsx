@@ -70,27 +70,29 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface TakePicturesProps {
-  initialCount: PhotoboothStore['interface']['initialCount'];
   cloudSettings: PhotoboothStore['cloud'];
   countTime: PhotoboothStore['interface']['countTime'];
-  waitTime: PhotoboothStore['interface']['waitTime'];
+  initialCount: PhotoboothStore['interface']['initialCount'];
   maxPhotos: PhotoboothStore['photostrip']['maxPhotos'];
-  photostrips: PhotostripList;
-  setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
-  ratio: ImageRatio;
   photoPreview: PhotoboothStore['interface']['photoPreview'];
+  photostrips: PhotostripList;
+  printerName: PhotoboothStore['printer']['printerName'];
+  ratio: ImageRatio;
+  setPhotostrips: Dispatch<SetStateAction<PhotostripList>>;
+  waitTime: PhotoboothStore['interface']['waitTime'];
 }
 
 const TakePictures: FC<TakePicturesProps> = ({
-  initialCount,
-  countTime,
   cloudSettings,
-  waitTime,
+  countTime,
+  initialCount,
   maxPhotos,
-  photostrips,
-  setPhotostrips,
   photoPreview,
+  photostrips,
+  printerName,
   ratio,
+  setPhotostrips,
+  waitTime,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -136,7 +138,8 @@ const TakePictures: FC<TakePicturesProps> = ({
       const stripData = await window.photostrip.createStrips();
       setPhotostrips([...stripData]);
       window.cloud.uploadPhotos(cloudSettings, photos, ratio);
-      history.push('/selection');
+      if (printerName) history.push('/selection');
+      else history.push('/');
     };
     if (photos.length === maxPhotos && photostrips.length === 0) {
       createStrips();
@@ -144,13 +147,14 @@ const TakePictures: FC<TakePicturesProps> = ({
       setPhotostrips([]);
     }
   }, [
-    photos,
-    history,
-    photostrips,
-    setPhotostrips,
-    maxPhotos,
-    ratio,
     cloudSettings,
+    history,
+    maxPhotos,
+    photos,
+    photostrips,
+    printerName,
+    ratio,
+    setPhotostrips,
   ]);
 
   let countText;
