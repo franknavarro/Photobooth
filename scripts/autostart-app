@@ -1,0 +1,7 @@
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xset s off
+@xset -dpms
+@xset s noblank
+
+@npm run electron --prefix /home/pi/photobooth

@@ -3,7 +3,9 @@
 LIBGPHOTO2_DIR="$HOME/libgphoto2 "
 GPHOTO2_DIR="$HOME/gphoto2"
 
+echo "===================================================="
 echo "INSTALLING GPHOTO2"
+echo "===================================================="
 
 apt update && \
   apt install -y \

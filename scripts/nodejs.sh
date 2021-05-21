@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "===================================================="
-echo "INSTALLING CUPS"
+echo "INSTALING NODEJS 14.x"
 echo "===================================================="
 
-apt update && \
-  apt install -y cups
+curl -sL https://deb.nodesource.com/setup_14.x | bash - &&
+  apt install nodejs
