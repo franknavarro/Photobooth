@@ -3,8 +3,8 @@ const { app, protocol, BrowserWindow } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
 
-// const isDev = !app.isPackaged;
-const isDev = false;
+const isDev = !app.isPackaged;
+// const isDev = false;
 
 function createWindow() {
   // Create the browser window.

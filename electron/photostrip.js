@@ -60,7 +60,8 @@ ipcMain.handle('initialize-strip', async (_, settings) => {
   const photoBoxSize = {
     width: photostripSize.width - border.horizontal * 2,
     height: Math.round(
-      photostripSize.height / usingPhotos - border.vertical * 1.5,
+      (photostripSize.height - border.vertical * (usingPhotos + 1)) /
+        usingPhotos,
     ),
   };
 
