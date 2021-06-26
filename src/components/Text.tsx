@@ -9,7 +9,7 @@ const useStyles = makeStyles({
   },
 });
 
-const DEFAULT_TEXT = 'h2';
+const DEFAULT_TEXT = 'h1';
 
 export type TextProps = TypographyProps;
 

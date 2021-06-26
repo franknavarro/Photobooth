@@ -91,7 +91,9 @@ const SelectStrip: FC<SelectStripProps> = ({
           ))}
         </Grid>
       </FlexBox>
-      <FlexText>Auto Selecting in {count}</FlexText>
+      <FlexText>
+        Auto Selecting "{photostrips[0].description}" in {count}
+      </FlexText>
     </FullScreen>
   );
 };

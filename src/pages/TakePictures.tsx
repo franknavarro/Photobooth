@@ -84,6 +84,8 @@ interface TakePicturesProps {
   waitTime: PhotoboothStore['interface']['waitTime'];
 }
 
+const COUNT_BUFFER = 2;
+
 const TakePictures: FC<TakePicturesProps> = ({
   adjustLeftCut,
   adjustRightCut,
@@ -101,13 +103,13 @@ const TakePictures: FC<TakePicturesProps> = ({
   const classes = useStyles();
   const history = useHistory();
   const [run, setRun] = useState<boolean>(true);
-  const [count, setCount] = useCountDown(initialCount);
+  const [count, setCount] = useCountDown(initialCount + COUNT_BUFFER);
   const [photos, setPhotos] = useState<{ full: string; small: string }[]>([]);
   const [takingPhoto, setTakingPhoto] = useState<boolean>(false);
   const startingCount = photos.length ? countTime : initialCount;
 
   const reset = useCallback((): void => {
-    setCount(countTime);
+    setCount(countTime + COUNT_BUFFER);
     setRun(true);
   }, [setCount, countTime]);
 
@@ -168,7 +170,8 @@ const TakePictures: FC<TakePicturesProps> = ({
   ]);
 
   let countText;
-  if (count === startingCount) countText = 'Get Ready...';
+  if (count >= startingCount)
+    countText = `Get Ready for Photo ${photos.length + 1} of ${maxPhotos}`;
   else if (count) countText = count;
   else if (takingPhoto) countText = 'SNAP';
   else countText = 'Looking Good!';
