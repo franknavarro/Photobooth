@@ -7,7 +7,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import FullScreen from '../components/FullScreen';
 import Text from '../components/Text';
 
-const iconSize = '7rem';
+const iconSize = '13rem';
 const useStyles = makeStyles((theme) => ({
   icon: {
     fontSize: iconSize,
@@ -79,7 +79,7 @@ const Print: FC<PrintProps> = ({ printerName, selectedStrip }) => {
 
   return (
     <FullScreen>
-      {!printingDone && <CircularProgress color="primary" size={iconSize} />}
+      {!printingDone && <CircularProgress color="primary" size="7rem" />}
       <Text className={classes.text}>
         {printingDone ? "Don't leave without your photos!" : 'Printing...'}
       </Text>

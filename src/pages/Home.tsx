@@ -5,7 +5,7 @@ import CameraAltRoundedIcon from '@material-ui/icons/CameraAltRounded';
 import FlexText from '../components/FlexText';
 import FullScreen from '../components/FullScreen';
 
-export const iconSize = '7rem';
+export const iconSize = '13rem';
 const useStyles = makeStyles((theme) => ({
   icon: {
     fontSize: iconSize,
